@@ -1,0 +1,176 @@
+{
+  "stays": {
+    "has_days": 7405,
+    "no_segment_overlaps_stay": 3713,
+    "stay_under_two_grid_days": 2486
+  },
+  "patients_with_stays": 7306,
+  "patients_with_a_segment_in_a_stay": 6171,
+  "days_in_stays_with_a_segment": 33387,
+  "days_with_no_owned_slot": 7861,
+  "kept_by_rule": {
+    "all_three": {
+      "80%": {
+        "days": 22126,
+        "stays": 6527,
+        "patients": 5497
+      },
+      "70%": {
+        "days": 23057,
+        "stays": 6799,
+        "patients": 5723
+      },
+      "60%": {
+        "days": 23504,
+        "stays": 6902,
+        "patients": 5801
+      },
+      "50%": {
+        "days": 23846,
+        "stays": 6976,
+        "patients": 5854
+      },
+      "30%": {
+        "days": 24434,
+        "stays": 7128,
+        "patients": 5961
+      },
+      "10%": {
+        "days": 25050,
+        "stays": 7264,
+        "patients": 6068
+      },
+      "any": {
+        "days": 25386,
+        "stays": 7316,
+        "patients": 6108
+      }
+    },
+    "ecg_resp": {
+      "80%": {
+        "days": 22313,
+        "stays": 6572,
+        "patients": 5534
+      },
+      "70%": {
+        "days": 23173,
+        "stays": 6821,
+        "patients": 5740
+      },
+      "60%": {
+        "days": 23584,
+        "stays": 6916,
+        "patients": 5812
+      },
+      "50%": {
+        "days": 23904,
+        "stays": 6984,
+        "patients": 5859
+      },
+      "30%": {
+        "days": 24469,
+        "stays": 7132,
+        "patients": 5963
+      },
+      "10%": {
+        "days": 25080,
+        "stays": 7267,
+        "patients": 6070
+      },
+      "any": {
+        "days": 25412,
+        "stays": 7318,
+        "patients": 6110
+      }
+    },
+    "ecg_ppg": {
+      "80%": {
+        "days": 22382,
+        "stays": 6566,
+        "patients": 5529
+      },
+      "70%": {
+        "days": 23320,
+        "stays": 6839,
+        "patients": 5757
+      },
+      "60%": {
+        "days": 23766,
+        "stays": 6939,
+        "patients": 5833
+      },
+      "50%": {
+        "days": 24088,
+        "stays": 7008,
+        "patients": 5883
+      },
+      "30%": {
+        "days": 24637,
+        "stays": 7151,
+        "patients": 5982
+      },
+      "10%": {
+        "days": 25204,
+        "stays": 7273,
+        "patients": 6076
+      },
+      "any": {
+        "days": 25479,
+        "stays": 7317,
+        "patients": 6109
+      }
+    },
+    "ecg": {
+      "80%": {
+        "days": 22572,
+        "stays": 6613,
+        "patients": 5568
+      },
+      "70%": {
+        "days": 23442,
+        "stays": 6862,
+        "patients": 5775
+      },
+      "60%": {
+        "days": 23848,
+        "stays": 6954,
+        "patients": 5845
+      },
+      "50%": {
+        "days": 24149,
+        "stays": 7017,
+        "patients": 5889
+      },
+      "30%": {
+        "days": 24672,
+        "stays": 7154,
+        "patients": 5983
+      },
+      "10%": {
+        "days": 25231,
+        "stays": 7275,
+        "patients": 6077
+      },
+      "any": {
+        "days": 25500,
+        "stays": 7319,
+        "patients": 6111
+      }
+    }
+  },
+  "check_equals_plan": {
+    "days": 22126,
+    "stays": 6527,
+    "patients": 5497
+  },
+  "all_three_clip_histogram_days": {
+    "0-0": 8001,
+    "1-47": 336,
+    "48-143": 616,
+    "144-239": 588,
+    "240-287": 342,
+    "288-335": 447,
+    "336-383": 931,
+    "384-480": 22126
+  }
+}

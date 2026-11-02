@@ -1,0 +1,24 @@
+{
+  "windows": 512,
+  "loaded_keys": 228,
+  "initialized_keys": [
+    "encoder.resp_channel_type_embedding",
+    "resp_decoder_ts_type_embeddings",
+    "to_seg.13.bias",
+    "to_seg.13.weight"
+  ],
+  "metrics": {
+    "ecg_raw_mse": 0.91979,
+    "ecg_zero_mse": 1.00327,
+    "ecg_interpolation_mse": 1.53678,
+    "ecg_normalized_target_mse": 0.3425,
+    "ecg_normalized_zero_mse": 0.99998,
+    "ecg_scale_free_mse": 0.4699,
+    "ppg_raw_mse": 1.40024,
+    "ppg_zero_mse": 0.99916,
+    "ppg_interpolation_mse": 1.18113,
+    "ppg_normalized_target_mse": 0.18404,
+    "ppg_normalized_zero_mse": 0.99998,
+    "ppg_scale_free_mse": 0.23985
+  }
+}

@@ -1,0 +1,28 @@
+# Patient-level data, model weights and run outputs never enter the repository.
+__pycache__/
+*.pyc
+.venv/
+private
+*.log
+output
+output_tail
+inputs
+runs
+text
+private_verify/
+*.sqlite*
+*.pt
+*.pth
+*.npz
+*.npy
+*.pkl
+*.csv
+*.csv.gz
+!encoder_comparison/results/*.csv
+
+# Link made by link_existing_outputs.sh
+/pretrained_model_for_share
+
+# Aggregates with very small patient counts
+encoder_comparison/label_audit/ehr_audit.json
+encoder_comparison/probe_labels/labels_summary.json

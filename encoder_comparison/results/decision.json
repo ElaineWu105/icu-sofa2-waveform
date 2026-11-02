@@ -1,0 +1,13 @@
+{
+  "chosen": "arm_b",
+  "lines": [
+    "- arm_a: FAIL. Lost 1, inconclusive 13 of 31 retention checks. All three channels against original CSFM on ECG + PPG: RR better, invasive support better, ICD respiratory same.",
+    "  - lost: death_1y on ecg, auroc gain -0.033 [-0.0614, -0.0052]",
+    "- arm_b: PASS. Lost 0, inconclusive 9 of 31 retention checks. All three channels against original CSFM on ECG + PPG: RR better, invasive support better, ICD respiratory same.",
+    "- epoch17 for reference: lost 2 of 31 retention checks.",
+    "- Chosen encoder: arm_b."
+  ],
+  "skipped": {
+    "lbbb on ecg": "positives: fit 33, validation 0"
+  }
+}

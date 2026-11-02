@@ -1,0 +1,142 @@
+{
+  "skips": {
+    "layout_segment": 11617,
+    "gap_segment": 41150,
+    "nonzero_master_counter": 215,
+    "index_utc_offset_change": 161,
+    "no_selected_signal_channels": 822
+  },
+  "stays": {
+    "has_days": 7411,
+    "no_segment_overlaps_stay": 3707,
+    "stay_under_two_grid_days": 2486
+  },
+  "all_three": {
+    "80%": {
+      "days": 23131,
+      "stays": 6609,
+      "patients": 5554
+    },
+    "70%": {
+      "days": 24033,
+      "stays": 6869,
+      "patients": 5771
+    },
+    "60%": {
+      "days": 24484,
+      "stays": 6970,
+      "patients": 5849
+    },
+    "50%": {
+      "days": 24810,
+      "stays": 7039,
+      "patients": 5898
+    },
+    "30%": {
+      "days": 25329,
+      "stays": 7171,
+      "patients": 5990
+    },
+    "10%": {
+      "days": 25876,
+      "stays": 7277,
+      "patients": 6072
+    },
+    "any": {
+      "days": 26190,
+      "stays": 7322,
+      "patients": 6108
+    }
+  },
+  "by_split_80pct": {
+    "train": {
+      "days": 16302,
+      "patients": 3907
+    },
+    "val": {
+      "days": 3408,
+      "patients": 831
+    },
+    "test": {
+      "days": 3421,
+      "patients": 816
+    }
+  },
+  "clock_records": 300,
+  "hr_median_abs_gap_by_lag": {
+    "before_index_end": {
+      "-21600": {
+        "pairs": 5660,
+        "median": 8.0,
+        "within_5bpm": 0.376
+      },
+      "-3600": {
+        "pairs": 6681,
+        "median": 6.0,
+        "within_5bpm": 0.496
+      },
+      "-600": {
+        "pairs": 6941,
+        "median": 4.0,
+        "within_5bpm": 0.583
+      },
+      "0": {
+        "pairs": 7069,
+        "median": 3.0,
+        "within_5bpm": 0.642
+      },
+      "600": {
+        "pairs": 7060,
+        "median": 4.0,
+        "within_5bpm": 0.582
+      },
+      "3600": {
+        "pairs": 7045,
+        "median": 6.0,
+        "within_5bpm": 0.497
+      },
+      "21600": {
+        "pairs": 7034,
+        "median": 7.0,
+        "within_5bpm": 0.415
+      }
+    },
+    "tail": {
+      "-21600": {
+        "pairs": 7677,
+        "median": 7.0,
+        "within_5bpm": 0.408
+      },
+      "-3600": {
+        "pairs": 7743,
+        "median": 5.0,
+        "within_5bpm": 0.516
+      },
+      "-600": {
+        "pairs": 7757,
+        "median": 4.0,
+        "within_5bpm": 0.597
+      },
+      "0": {
+        "pairs": 7778,
+        "median": 3.0,
+        "within_5bpm": 0.641
+      },
+      "600": {
+        "pairs": 7759,
+        "median": 4.0,
+        "within_5bpm": 0.605
+      },
+      "3600": {
+        "pairs": 7589,
+        "median": 5.0,
+        "within_5bpm": 0.517
+      },
+      "21600": {
+        "pairs": 6628,
+        "median": 7.0,
+        "within_5bpm": 0.422
+      }
+    }
+  }
+}

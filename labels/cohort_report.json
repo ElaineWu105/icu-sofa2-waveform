@@ -1,0 +1,397 @@
+{
+ "day_one_all_stays": {
+  "stays": 13604,
+  "icu_deaths": 1031,
+  "icu_mortality_pct": 7.58,
+  "auroc_sofa2": 0.8098,
+  "auroc_sofa1": 0.8073,
+  "sofa2_median_iqr": [
+   4.0,
+   2.0,
+   7.0
+  ],
+  "sofa1_median_iqr": [
+   5.0,
+   3.0,
+   7.0
+  ],
+  "sofa2_versus_sofa1": {
+   "same_pct": 32.1,
+   "higher_pct": 23.7,
+   "lower_pct": 44.2
+  },
+  "organ_mean_sofa2": {
+   "brain": 0.744,
+   "resp": 0.848,
+   "cv": 1.32,
+   "liver": 0.237,
+   "kidney": 1.155,
+   "hemo": 0.692
+  },
+  "organ_mean_sofa1": {
+   "brain": 0.737,
+   "resp": 1.375,
+   "cv": 1.369,
+   "liver": 0.279,
+   "kidney": 0.865,
+   "hemo": 0.583
+  },
+  "evidence_pct": {
+   "brain": 91.3,
+   "resp": 78.2,
+   "cv": 99.8,
+   "liver": 47.8,
+   "kidney": 97.1,
+   "hemo": 95.3
+  },
+  "sofa2_variants": {
+   "no_urine_or_rrt_in_kidney": {
+    "same_pct": 34.9,
+    "higher_pct": 9.3,
+    "lower_pct": 55.8,
+    "auroc": 0.8109
+   },
+   "no_rrt_in_kidney": {
+    "same_pct": 32.2,
+    "higher_pct": 19.3,
+    "lower_pct": 48.5,
+    "auroc": 0.8091
+   },
+   "abg_only_resp": {
+    "same_pct": 26.5,
+    "higher_pct": 19.5,
+    "lower_pct": 54.1,
+    "auroc": 0.7903
+   }
+  }
+ },
+ "day_one_first_stay_per_patient": {
+  "stays": 7306,
+  "icu_deaths": 495,
+  "icu_mortality_pct": 6.78,
+  "auroc_sofa2": 0.8161,
+  "auroc_sofa1": 0.8205,
+  "sofa2_median_iqr": [
+   5.0,
+   2.0,
+   7.0
+  ],
+  "sofa1_median_iqr": [
+   5.0,
+   3.0,
+   7.0
+  ],
+  "sofa2_versus_sofa1": {
+   "same_pct": 28.7,
+   "higher_pct": 27.3,
+   "lower_pct": 44.0
+  },
+  "organ_mean_sofa2": {
+   "brain": 0.706,
+   "resp": 0.9,
+   "cv": 1.373,
+   "liver": 0.249,
+   "kidney": 1.078,
+   "hemo": 0.735
+  },
+  "organ_mean_sofa1": {
+   "brain": 0.703,
+   "resp": 1.466,
+   "cv": 1.375,
+   "liver": 0.292,
+   "kidney": 0.72,
+   "hemo": 0.629
+  },
+  "evidence_pct": {
+   "brain": 90.4,
+   "resp": 82.2,
+   "cv": 99.9,
+   "liver": 46.1,
+   "kidney": 98.0,
+   "hemo": 96.4
+  },
+  "sofa2_variants": {
+   "no_urine_or_rrt_in_kidney": {
+    "same_pct": 33.2,
+    "higher_pct": 10.3,
+    "lower_pct": 56.5,
+    "auroc": 0.8173
+   },
+   "no_rrt_in_kidney": {
+    "same_pct": 29.0,
+    "higher_pct": 23.6,
+    "lower_pct": 47.4,
+    "auroc": 0.814
+   },
+   "abg_only_resp": {
+    "same_pct": 24.5,
+    "higher_pct": 23.6,
+    "lower_pct": 51.9,
+    "auroc": 0.7993
+   }
+  }
+ },
+ "anchors_planned": 23131,
+ "anchors_passing": 22341,
+ "anchors_stayed": 16670,
+ "passing_by_split": {
+  "train": 15731,
+  "val": 3312,
+  "test": 3298
+ },
+ "passing_by_fate": {
+  "stayed": 16670,
+  "left_alive": 5044,
+  "died": 627
+ },
+ "passing_patients": 5406,
+ "passing_stays": 6416,
+ "patients_by_split": {
+  "test": 793,
+  "train": 3799,
+  "val": 814
+ },
+ "organ_delta_real": {
+  "brain": {
+   "n": 12587,
+   "down_pct": 17.5,
+   "same_pct": 68.2,
+   "up_pct": 14.3,
+   "up_ge2_pct": 3.0,
+   "abs_ge2_pct": 7.0,
+   "abs_ge3_pct": 2.4,
+   "coverage_pct": 75.5,
+   "patients": 3287,
+   "by_split": {
+    "test": 1868,
+    "train": 8907,
+    "val": 1812
+   },
+   "baseline_evidence_pct": 80.6,
+   "future_evidence_pct": 83.1
+  },
+  "resp": {
+   "n": 12281,
+   "down_pct": 21.9,
+   "same_pct": 61.3,
+   "up_pct": 16.8,
+   "up_ge2_pct": 4.8,
+   "abs_ge2_pct": 11.4,
+   "abs_ge3_pct": 2.5,
+   "coverage_pct": 73.7,
+   "patients": 2816,
+   "by_split": {
+    "test": 1785,
+    "train": 8601,
+    "val": 1895
+   },
+   "baseline_evidence_pct": 82.9,
+   "future_evidence_pct": 81.0
+  },
+  "cv": {
+   "n": 16643,
+   "down_pct": 23.5,
+   "same_pct": 63.7,
+   "up_pct": 12.9,
+   "up_ge2_pct": 2.1,
+   "abs_ge2_pct": 6.4,
+   "abs_ge3_pct": 1.0,
+   "coverage_pct": 99.8,
+   "patients": 3545,
+   "by_split": {
+    "test": 2447,
+    "train": 11728,
+    "val": 2468
+   },
+   "baseline_evidence_pct": 99.9,
+   "future_evidence_pct": 99.9
+  },
+  "liver": {
+   "n": 4688,
+   "down_pct": 7.5,
+   "same_pct": 86.5,
+   "up_pct": 6.0,
+   "up_ge2_pct": 0.1,
+   "abs_ge2_pct": 0.3,
+   "abs_ge3_pct": 0.0,
+   "coverage_pct": 28.1,
+   "patients": 1376,
+   "by_split": {
+    "test": 676,
+    "train": 3297,
+    "val": 715
+   },
+   "baseline_evidence_pct": 41.7,
+   "future_evidence_pct": 36.8
+  },
+  "kidney": {
+   "n": 16562,
+   "down_pct": 15.3,
+   "same_pct": 69.8,
+   "up_pct": 14.9,
+   "up_ge2_pct": 4.2,
+   "abs_ge2_pct": 9.3,
+   "abs_ge3_pct": 0.9,
+   "coverage_pct": 99.4,
+   "patients": 3508,
+   "by_split": {
+    "test": 2443,
+    "train": 11659,
+    "val": 2460
+   },
+   "baseline_evidence_pct": 99.8,
+   "future_evidence_pct": 99.5
+  },
+  "hemo": {
+   "n": 15705,
+   "down_pct": 9.7,
+   "same_pct": 82.6,
+   "up_pct": 7.6,
+   "up_ge2_pct": 0.7,
+   "abs_ge2_pct": 1.4,
+   "abs_ge3_pct": 0.2,
+   "coverage_pct": 94.2,
+   "patients": 3453,
+   "by_split": {
+    "test": 2326,
+    "train": 11081,
+    "val": 2298
+   },
+   "baseline_evidence_pct": 97.4,
+   "future_evidence_pct": 96.1
+  }
+ },
+ "total_delta": {
+  "six_real_both_ends": {
+   "n": 2227,
+   "down_pct": 41.6,
+   "same_pct": 27.0,
+   "up_pct": 31.3,
+   "up_ge2_pct": 15.6,
+   "abs_ge2_pct": 38.2,
+   "abs_ge3_pct": 19.6,
+   "coverage_pct": 13.4,
+   "patients": 853,
+   "real_endpoints_pct": 100.0,
+   "by_split": {
+    "test": 328,
+    "train": 1565,
+    "val": 334
+   }
+  },
+  "carry_at_most_one_window": {
+   "n": 4910,
+   "down_pct": 42.4,
+   "same_pct": 28.2,
+   "up_pct": 29.4,
+   "up_ge2_pct": 14.5,
+   "abs_ge2_pct": 37.2,
+   "abs_ge3_pct": 18.3,
+   "coverage_pct": 29.5,
+   "patients": 1768,
+   "real_endpoints_pct": 94.3,
+   "by_split": {
+    "test": 714,
+    "train": 3452,
+    "val": 744
+   }
+  },
+  "full_sofa2_rule": {
+   "n": 16670,
+   "down_pct": 41.4,
+   "same_pct": 28.7,
+   "up_pct": 29.9,
+   "up_ge2_pct": 13.4,
+   "abs_ge2_pct": 33.9,
+   "abs_ge3_pct": 15.4,
+   "coverage_pct": 100.0,
+   "patients": 3549,
+   "real_endpoints_pct": 83.2,
+   "by_split": {
+    "test": 2454,
+    "train": 11747,
+    "val": 2469
+   }
+  }
+ },
+ "paired_real_organs_per_anchor": {
+  "at_most_2": 95,
+  "3": 642,
+  "4": 5534,
+  "5": 8172,
+  "6": 2227
+ },
+ "waveform": {
+  "all_three_pct_of_slots_median": 98.0,
+  "valid_clips_median_iqr": [
+   465.0,
+   447.0,
+   474.0
+  ]
+ },
+ "demographics": {
+  "test": {
+   "patients": 793,
+   "stays": 948,
+   "age_median_iqr": [
+    67.0,
+    56.0,
+    77.0
+   ],
+   "female_pct": 43.6,
+   "icu_los_days_median_iqr": [
+    2.95,
+    1.81,
+    5.57
+   ]
+  },
+  "train": {
+   "patients": 3799,
+   "stays": 4531,
+   "age_median_iqr": [
+    68.0,
+    57.0,
+    77.0
+   ],
+   "female_pct": 41.9,
+   "icu_los_days_median_iqr": [
+    2.95,
+    1.83,
+    5.77
+   ]
+  },
+  "val": {
+   "patients": 814,
+   "stays": 937,
+   "age_median_iqr": [
+    67.0,
+    56.25,
+    76.0
+   ],
+   "female_pct": 41.3,
+   "icu_los_days_median_iqr": [
+    2.89,
+    1.81,
+    5.85
+   ]
+  },
+  "all": {
+   "patients": 5406,
+   "stays": 6416,
+   "age_median_iqr": [
+    67.0,
+    57.0,
+    77.0
+   ],
+   "female_pct": 42.1,
+   "icu_los_days_median_iqr": [
+    2.95,
+    1.82,
+    5.79
+   ]
+  }
+ },
+ "rrt_days_pct": 15.6,
+ "rrt_exact_days_pct": 12.9,
+ "ne_half_dose_changes_cv_pct": 4.0
+}

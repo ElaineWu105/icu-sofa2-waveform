@@ -1,0 +1,126 @@
+{
+  "days": 800,
+  "windows": 18803,
+  "windows_with_numerics_file": 0.8611,
+  "field_coverage_of_all_windows": {
+    "HR [bpm]": 0.8603,
+    "RR [rpm]": 0.8577,
+    "SpO2 [%]": 0.855,
+    "Pulse (SpO2) [bpm]": 0.8481,
+    "PVC [/min]": 0.8532,
+    "QT [msec]": 0.6406,
+    "QTc [msec]": 0.6406,
+    "ST-V [mm]": 0.732,
+    "NBPs [mmHg]": 0.6067,
+    "NBPd [mmHg]": 0.6067,
+    "NBPm [mmHg]": 0.6068,
+    "ABPs [mmHg]": 0.2575,
+    "ABPd [mmHg]": 0.2575,
+    "ABPm [mmHg]": 0.2603,
+    "ARTs [mmHg]": 0.0306,
+    "ARTd [mmHg]": 0.0306,
+    "ARTm [mmHg]": 0.0308,
+    "CVPm [mmHg]": 0.0855,
+    "PAPm [mmHg]": 0.0429,
+    "PPV [%]": 0.0876,
+    "Perf [NU]": 0.5429,
+    "etCO2 [mmHg]": 0.0002,
+    "awRR [rpm]": 0.0002
+  },
+  "alignment_signal_vs_numerics_by_lag_seconds": {
+    "hr": {
+      "-3600": {
+        "n": 15695,
+        "pearson": 0.306,
+        "median_abs_error": 4.76
+      },
+      "-300": {
+        "n": 16095,
+        "pearson": 0.3261,
+        "median_abs_error": 2.34
+      },
+      "-60": {
+        "n": 16158,
+        "pearson": 0.3354,
+        "median_abs_error": 1.66
+      },
+      "-30": {
+        "n": 16166,
+        "pearson": 0.3368,
+        "median_abs_error": 1.55
+      },
+      "0": {
+        "n": 16173,
+        "pearson": 0.345,
+        "median_abs_error": 1.04
+      },
+      "30": {
+        "n": 16167,
+        "pearson": 0.3391,
+        "median_abs_error": 1.38
+      },
+      "60": {
+        "n": 16161,
+        "pearson": 0.3371,
+        "median_abs_error": 1.62
+      },
+      "300": {
+        "n": 16121,
+        "pearson": 0.3295,
+        "median_abs_error": 2.31
+      },
+      "3600": {
+        "n": 15915,
+        "pearson": 0.3001,
+        "median_abs_error": 4.71
+      }
+    },
+    "rr": {
+      "-3600": {
+        "n": 15373,
+        "pearson": 0.4067,
+        "median_abs_error": 3.64
+      },
+      "-300": {
+        "n": 15856,
+        "pearson": 0.4691,
+        "median_abs_error": 2.89
+      },
+      "-60": {
+        "n": 15924,
+        "pearson": 0.5002,
+        "median_abs_error": 2.56
+      },
+      "-30": {
+        "n": 15953,
+        "pearson": 0.5126,
+        "median_abs_error": 2.52
+      },
+      "0": {
+        "n": 15966,
+        "pearson": 0.5291,
+        "median_abs_error": 2.26
+      },
+      "30": {
+        "n": 15922,
+        "pearson": 0.5305,
+        "median_abs_error": 2.26
+      },
+      "60": {
+        "n": 15922,
+        "pearson": 0.5042,
+        "median_abs_error": 2.55
+      },
+      "300": {
+        "n": 15888,
+        "pearson": 0.4741,
+        "median_abs_error": 2.89
+      },
+      "3600": {
+        "n": 15608,
+        "pearson": 0.4092,
+        "median_abs_error": 3.63
+      }
+    }
+  }
+}

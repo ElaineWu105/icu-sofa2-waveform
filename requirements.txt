@@ -1,0 +1,12 @@
+# Python 3.11. Versions from the environment that ran this code.
+numpy==2.4.4
+pandas==2.2.3
+scipy==1.17.1
+scikit-learn==1.6.1
+torch==2.7.0
+transformers==4.44.2
+tokenizers==0.19.1
+wfdb==4.3.0
+neurokit2==0.2.12
+PyWavelets==1.8.0
+xgboost-cpu==3.1.3

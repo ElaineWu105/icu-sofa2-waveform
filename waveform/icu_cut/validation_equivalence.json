@@ -1,0 +1,11 @@
+{
+  "checked": 200,
+  "byte_equal": 200,
+  "unequal": 0,
+  "compared": [
+    "signal",
+    "modality_mask",
+    "channel_ids"
+  ],
+  "source": "10.14/signal_preprocess_10s_joint_csfm/output/full"
+}

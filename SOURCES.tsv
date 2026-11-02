@@ -1,0 +1,87 @@
+file	original	status	change	original_sha256
+waveform/native_index/indexing.py	10.13/signal_preprocess/indexing.py	identical		4208db8a6751afb71e60787ab269a3acbdc50c5369be2a74524bcefefea69811
+waveform/native_index/native.py	10.13/signal_preprocess/native.py	identical		27419c2aa24ae852923ba34ac6412aa68456c1126fd67d1a943934c63b258878
+waveform/native_index/test_indexing.py	10.13/signal_preprocess/test_indexing.py	identical		15ccf2f5c7a6bf4701cf91985ce75da5b44439268ae1126965973919610d2e85
+waveform/native_index/test_native.py	10.13/signal_preprocess/test_native.py	identical		28252840b48394c266451a6f5062e6edd9cc9c67404ba4a49029d2ed22d92374
+waveform/windows_10s/processing.py	10.14/signal_preprocess_10s_joint_csfm/processing.py	identical		1c9350c5602c6e6acaeeedcd5470ae2b68d0050533ce2149857780fb2036a288
+waveform/windows_10s/source.py	10.14/signal_preprocess_10s_joint_csfm/source.py	identical		ec0f1421ba539b9f0bfdb36ba4d48e50ff45d470a5792baa6b4936760435e01a
+waveform/windows_10s/test_processing.py	10.14/signal_preprocess_10s_joint_csfm/test_processing.py	identical		5fb8d37fbcef1726b967a246ba0d1df6bf521317c14f62e284059b20c9bf2e72
+waveform/windows_10s/test_source.py	10.14/signal_preprocess_10s_joint_csfm/test_source.py	identical		5405b0f19254ca28b9fcba094c54b515cef68513d012fdfd8a618942e639ddca
+waveform/icu_cut/common.py	10.30/sofa2_icu_pipeline/waveform_cut/common.py	paths only	Project paths; raw data paths from env.sh; vendored NeuroKit path removed	b9bbe50028d7f06a0f316cdbc6035632465f19ce8b08b783124f96eef7b2464c
+waveform/icu_cut/plan.py	10.30/sofa2_icu_pipeline/waveform_cut/plan.py	edited	Default output path; --ignore-index-end and --skip-plan	b08d0ed865654395e33fc9ac4799a193d29167854fd86d95958de235c44ca856
+waveform/icu_cut/cut.py	10.30/sofa2_icu_pipeline/waveform_cut/cut.py	paths only	Default plan and output paths	ea60ca527e5e3853eeea4eb15b177d76a951edd543af3b965c5633e75a5810ff
+waveform/icu_cut/run.sh	10.30/sofa2_icu_pipeline/waveform_cut/run.sh	edited	Python from the environment, vendored NeuroKit removed	6f4d94162a84b3ce6438c4fc0a381ac4deaa14415869fc967268f38602218465
+waveform/icu_cut/test_cut.py	10.30/sofa2_icu_pipeline/waveform_cut/test_cut.py	edited	Added a test of open_ended	c7e4de26808f9ee2a760b62ed1eeaee2121d147d758d011858d85ff426be1244
+waveform/icu_cut/validate_equivalence.py	10.30/sofa2_icu_pipeline/waveform_cut/validate_equivalence.py	paths only	Path of the 10.14 outputs	0c77d445e68aa05d796bb3751e19e2136d09f3bad7f02b432901e4a3d88a0a05
+waveform/icu_cut/validation_equivalence.json	10.30/sofa2_icu_pipeline/waveform_cut/validation_equivalence.json	paths only	Local path removed	0ddcdc96ce217558cdc2fad375d00ca09e27b06178a157efd50afa2c3fb41da9
+finetune/csfm_mae/model.py	10.17/csfm_finetune/model.py	identical		783ed3c4f0893f3866701c80a3975e806a95d135a59fcb9c0fae3bbe9be38df0
+finetune/csfm_mae/dataset.py	10.17/csfm_finetune/dataset.py	identical		bdece0a404c4ecd685e2bd9464de4cc93601032d72025ce9014a0ce3f61fd9ce
+finetune/csfm_mae/train.py	10.17/csfm_finetune/train.py	identical		cdeb0b28d103ba2073261841087f5c1b71ad5eaca12e200040dd95fdc77d5f67
+finetune/csfm_mae/tokenizer_utils.py	10.17/csfm_finetune/tokenizer_utils.py	edited	Environment error message only	64b28f95e90a09a7351596bd12a5cd1f4760365a3a0e37d71cda8e2f346700c7
+finetune/csfm_mae/tokenizer_contract.json	10.17/csfm_finetune/tokenizer_contract.json	paths only	Local path removed	6de418cccfd83bed93d67622136089fa464e1874a69ca56725fd4ba5700867e8
+finetune/csfm_mae/test_model.py	10.17/csfm_finetune/test_model.py	identical		b79e1bfd22325fe3ae409b80f7aae1d0a8c4c13edfcef23a11f869c5739fadf6
+finetune/csfm_mae/test_train.py	10.17/csfm_finetune/test_train.py	identical		24a83aaf01cca36d543f52be217c242b6e7b61270b99487897bdaf3a1eafd2ed
+finetune/csfm_mae/test_tokenizer_utils.py	10.17/csfm_finetune/test_tokenizer_utils.py	identical		cda48afe1544cb4fc06490e06ee4bfeaf22bd8b4ca7681ed1165c9bd44f7bbfd
+finetune/arms/common.py	10.30/sofa2_icu_pipeline/csfm/common.py	paths only	Project paths	7f2bd9629f151bae05cf794edb59f1709327303587b770be542e31def783206c
+finetune/arms/data.py	10.30/sofa2_icu_pipeline/csfm/data.py	identical		bd52b577519e8bad6e617c6eb206cdfe38c6f30030f0444ef51b40ede5cc018b
+finetune/arms/prepare_text.py	10.30/sofa2_icu_pipeline/csfm/prepare_text.py	paths only	Raw data paths from env.sh	61bedaca8155247b4984ebe02c590e4663994dae65622bab603284113e8f7c85
+finetune/arms/check_mae.py	10.30/sofa2_icu_pipeline/csfm/check_mae.py	identical		0c99849b027c1b3c63ae7cd9000581d0197ed8143e5b1a02d2d35a886972fc94
+finetune/arms/check_mae.json	10.30/sofa2_icu_pipeline/csfm/check_mae.json	edited	Regenerated on the finished cut; the original ran on a partial cut	29f600617d8370a81ad5a97e0efb19927d0e0588bccaec1c4726730d48702520
+finetune/arms/finetune.py	10.30/sofa2_icu_pipeline/csfm/finetune.py	identical		0a3587b9af0bf7d95eecadf24f7d078b4dea9a52166de16b83db05c914176118
+finetune/arms/run.sh	10.30/sofa2_icu_pipeline/csfm/run.sh	edited	Python from the environment, vendored NeuroKit removed	c0347a757f779694344bf24014de829c5bf60903df5a1d1da5e0567989dbb23a
+finetune/arms/test_finetune.py	10.30/sofa2_icu_pipeline/csfm/test_finetune.py	edited	Dropped the two queue_gpus.py tests	3180ab5bca11354b397406a29d8c9b22a90829ec7f7221a171e153aa92b921ff
+labels/extract.py	11.1/sofa2_icu_pipeline/labels/extract.py	paths only	Raw data paths from env.sh	6a3918108958480293a286a032199dd5d54fddd0dc90665dd5a52962583cd59b
+labels/score.py	11.1/sofa2_icu_pipeline/labels/score.py	paths only	Raw data and private paths	1cbcd1c4961d3806b97de6bb59134b7c83cbbe4854efbb6e1b7f147948e7f3ec
+labels/finalize.py	11.1/sofa2_icu_pipeline/labels/finalize.py	edited	Raw data paths; reads both cuts; reports absolute delta ≥ 2	ea4ab80a2730ca6881f245459eaa3513dca21d4af0cd9bcb7bbb60fe2f1e9cbe
+labels/cohort_report.json	11.1/sofa2_icu_pipeline/labels/cohort_report.json	edited	Regenerated with the added days	826c23afbdbb47f2486385c63580c3503db47b8ac81cc77f29128bb3d1b55a68
+docs/SETTING.md	11.1/sofa2_icu_pipeline/SETTING.md	edited	Paths; decisions of 2026-11-02; sections 6 to 8 rewritten	201e35c98a66ea4d2ab044ce7c6482f008754ad85724b2190eb331baec4cdf94
+docs/COHORT.md	11.1/sofa2_icu_pipeline/COHORT.md	edited	Paths; numbers with the added days; SOFA-2 scoring section; absolute delta columns; limitations removed	7ae48c16dc977cb2bd352483f0884349f7d20b3db9a8cc1b0468f06c785f9b07
+encoder_comparison/common.py	11.1/csfm_downstream/common.py	paths only	Project paths	d4e705f6a9461809dac533262d0be201368829ab34a71143941a8cbad106def9
+encoder_comparison/run.sh	11.1/csfm_downstream/run.sh	edited	Python from the environment, 10.17 and 10.20 paths removed, folder renamed	c71f76cfd6223cee84d1644438aca35e20fbef7ff6031dcf3aceae7d3220bd95
+encoder_comparison/README.md	11.1/csfm_downstream/README.md	edited	Paths, folder rename, small-count note	438e0cb91d9bb0fa2249078a735c17f17b340a80713b65b4918a357f27a94924
+encoder_comparison/label_audit/extract_chart.py	11.1/csfm_downstream/label_audit/extract_chart.py	paths only	Project and raw data paths	36bb9ff68d3cc20cf839b230f8633ea96ead08d5e5ffbf9040d02bc615f007b9
+encoder_comparison/label_audit/audit_ehr.py	11.1/csfm_downstream/label_audit/audit_ehr.py	paths only	Project and raw data paths	55b03c207df65c9626cf20880339d9dc8771343c91cb8d66475c5ea2ecd1dd5c
+encoder_comparison/label_audit/audit_numerics.py	11.1/csfm_downstream/label_audit/audit_numerics.py	paths only	Project paths	1eff0361ec6de27cd95d3940418397f1f9d000778c58e914874cce17c3b4adb5
+encoder_comparison/label_audit/ehr_audit.json	11.1/csfm_downstream/label_audit/ehr_audit.json	identical		d0f534c028fd5c7238ccb9588e8cc0ce6ebdbb8642fa939fea02f30fa5540a1f
+encoder_comparison/label_audit/numerics_audit.json	11.1/csfm_downstream/label_audit/numerics_audit.json	identical		18f6062c3b25a1bbd6616de83a9761468e786af5606095d247f549b60d232957
+encoder_comparison/probe_labels/build.py	11.1/csfm_downstream/labels/build.py	identical		29b77227ed5c04d4db91b035dcf99ee5ba6528817e4457b60f78c39562c1f305
+encoder_comparison/probe_labels/test_build.py	11.1/csfm_downstream/labels/test_build.py	paths only	Folder rename	f4e48081a9bdb7e7d94d3063a6ddaa1f3c1484672644a3f3ac78c14a661ee4d6
+encoder_comparison/probe_labels/__init__.py	11.1/csfm_downstream/labels/__init__.py	identical		e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+encoder_comparison/probe_labels/labels_summary.json	11.1/csfm_downstream/labels/labels_summary.json	identical		f84f65fb246df32fe8888969bf9a3ec48018dbb40923b3357d331eacc9f4acdb
+encoder_comparison/probe_labels/resp_labels.py	10.20/csfm_3min_label_audit/resp_labels.py	identical		f3abe15961a0faefed48738ab0a13d21034c7523a49f5f877fb6dd58c4cb23ca
+encoder_comparison/features/extract.py	11.1/csfm_downstream/features/extract.py	edited	Local original-CSFM loader replaces the 10.17 import	5e2166f060ce33b6f9c001f76995dcbb2cfa07be8768c6ac15d671ef9d75f7f2
+encoder_comparison/probes/evaluate.py	11.1/csfm_downstream/probes/evaluate.py	edited	Local threshold function; original CSFM as the Resp reference	4c8e0c09868b68363843bc1ea1561ca8b2216e10c673d28ab02bb24c6f01d7e9
+encoder_comparison/probes/test_evaluate.py	11.1/csfm_downstream/probes/test_evaluate.py	edited	Resp reference is original CSFM	a17d6a7061aaf5b4ffaf929ba025642ed1fd22dd63777b8b10958a5d5bd909e4
+encoder_comparison/probes/__init__.py	11.1/csfm_downstream/probes/__init__.py	identical		e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+encoder_comparison/results/report.md	11.1/csfm_downstream/results/report.md	edited	Regenerated with original CSFM as the Resp reference	48b0a90da1b4722ac9546a49bcad0af61552b25470ecdba741ed25de66b62a0e
+encoder_comparison/results/metrics.csv	11.1/csfm_downstream/results/metrics.csv	edited	Regenerated with original CSFM as the Resp reference	53c8cc36c5e350cc4f2447a021a4d74ee4642523e98c3f9005bd967a3f6914e0
+encoder_comparison/results/comparisons.csv	11.1/csfm_downstream/results/comparisons.csv	edited	Regenerated with original CSFM as the Resp reference	7c488941d5e5d157571051ab2a556f1667caa6fa3b60b64ae0aa50593d544be8
+encoder_comparison/results/decision.json	11.1/csfm_downstream/results/decision.json	edited	Regenerated with original CSFM as the Resp reference	8261a111b3f60c99712f4ee27f06b08fd99b7dd6bc42403816395252b2a77f06
+waveform/coverage_audit/audit.py	new	new	Written on 2026-11-02	
+waveform/coverage_audit/audit_index_end.py	new	new	Written on 2026-11-02	
+waveform/coverage_audit/audit_tail.py	new	new	Written on 2026-11-02	
+waveform/coverage_audit/coverage_audit.json	new	new	Written on 2026-11-02	
+waveform/coverage_audit/index_end_audit.json	new	new	Written on 2026-11-02	
+waveform/coverage_audit/tail_audit.json	new	new	Written on 2026-11-02	
+README.md	new	new		
+env.sh	new	new		
+labels/run.sh	new	new		
+requirements.txt	new	new		
+.gitignore	new	new		
+docs/WAVEFORM_AND_FINETUNE.md	new	new		
+hierarchy/long_model.py	10.20/csfm_3min/long_model.py	paths only	Path of model.py	a9b67978c2985067847893fd3026b6f897f32d3d563452fd91ee71a625c81fe6
+hierarchy/distributed_cpu.py	10.20/csfm_3min/distributed_cpu.py	edited	Gloo timeout 30 minutes	04425b5626ae4f691fe4fcb53019d16cceffe6f8c031cb6a75a90686c7d55f0f
+hierarchy/temporal_model.py	10.24/sofa_multiscale_ssl/model.py	identical		3ee5d05ac3205d852717f0265628d16f71646168dbcf3a16dd532f5b7f49dece
+hierarchy/build_index.py	new	new	Written on 2026-11-02	
+hierarchy/clip_model.py	new	new	Written on 2026-11-02	
+hierarchy/common.py	new	new	Written on 2026-11-02	
+hierarchy/day_data.py	new	new	Written on 2026-11-02	
+hierarchy/extract_three_min.py	new	new	Written on 2026-11-02	
+hierarchy/run.sh	new	new	Written on 2026-11-02	
+hierarchy/sofa_head.py	new	new	Written on 2026-11-02	
+hierarchy/staged_check.py	new	new	Written on 2026-11-02	
+hierarchy/test_hierarchy.py	new	new	Written on 2026-11-02	
+hierarchy/train_day.py	new	new	Written on 2026-11-02	
+hierarchy/train_one_hour.py	new	new	Written on 2026-11-02	
+hierarchy/train_three_min.py	new	new	Written on 2026-11-02	
+link_existing_outputs.sh	new	new		

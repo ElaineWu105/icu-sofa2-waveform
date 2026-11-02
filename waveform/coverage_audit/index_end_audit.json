@@ -1,0 +1,16 @@
+{
+  "records": 11993,
+  "index_hours": 696680,
+  "master_hours": 757454,
+  "data_hours": 750246,
+  "data_hours_past_index_end": 60450,
+  "share_of_data_past_index_end": 0.0806,
+  "records_with_data_past_index_end": 2262,
+  "records_over_1h_past": 966,
+  "master_over_index_ratio": {
+    "p1": 0.998,
+    "median": 1.0,
+    "p99": 5.751,
+    "max": 203.766
+  }
+}
