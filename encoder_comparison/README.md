@@ -1,6 +1,8 @@
 # CSFM downstream comparison
 
-This compares four frozen encoders to choose one for the SOFA-2 pipeline: original CSFM, 10.17 epoch 17, arm A and arm B. It asks whether the original abilities are retained and whether Resp tasks improve. Task types follow the CSFM paper, on our own continuous waveform and EHR data. SOFA is not used. The rule is in `docs/SETTING.md`, section "Encoder choice".
+This compares frozen encoders to choose one for the SOFA-2 pipeline: original CSFM, arm A and arm B, plus arms B2 and B3, added on 2026-11-06 after the first results (`finetune/README.md` §3.10). The 10.17 epoch 17 encoder was trained on the earlier patient split and is no longer compared. It asks whether the original abilities are retained and whether Resp tasks improve. Task types follow the CSFM paper, on our own continuous waveform and EHR data. SOFA is not used. The rule is in `docs/SETTING.md`, section "Encoder choice".
+
+**Decision, 2026-11-06: arm A.** The pre-specified rule picks arm B, because arm A lost one retention check (sex from ECG alone, AUROC −0.032, 95% CI −0.062 to −0.002). The study team chose arm A instead: it is best on every Resp task and on heart rate, and the text arms gain over it only on findings that ECG machine text describes, while tying with it on text-free tasks. The reasons and costs are in `docs/SETTING.md`, "Encoder choice on the new split". `results/decision.json` keeps the rule's own output.
 
 ## Run
 
@@ -25,14 +27,14 @@ Expected time for the full run, from a 120-patient check: `labels` about 5 minut
 
 Read `results/report.md` first.
 
-If `features` runs out of GPU memory, lower `--batch-size`. A finished step does not need rerunning: `probes` reuses saved predictions, so delete `private/predictions/` after changing a task.
+If `features` runs out of GPU memory, lower `--batch-size`. A finished step does not need rerunning. `features` keeps progress per encoder, and `probes` reuses saved predictions, so an added encoder is extracted and fitted alone. Delete `private/predictions/` after changing a task.
 
 ## Method
 
 - **Patients:** train and validation only, one first qualifying ICU day each. The test split is never read.
 - **Windows:** one 10-second slot per ICU hour with all three channels, holding a charted vital when the hour has one. Selection never uses a label value.
 - **Encoders:** eval mode, no gradients, no masking and no text. Original CSFM receives no Resp input.
-- **Inputs:** ECG, PPG, and ECG + PPG for all encoders; all three channels and Resp alone for the three with a Resp channel.
+- **Inputs:** ECG, PPG, and ECG + PPG for all encoders; all three channels and Resp alone for the arms, which have a Resp channel.
 - **Predictor:** XGBoost with 300 trees, depth 6 and learning rate 0.05, as in the 10.17 and 10.28 probes. One seed is used because these settings give identical trees across seeds.
 - **Splits:** fit on 90% of train patients, choose thresholds on the other 10%, score validation patients.
 - **Uncertainty:** 1,000 paired draws of validation patients. Each draw keeps all rows of a patient.
@@ -49,7 +51,10 @@ If `features` runs out of GPU memory, lower `--batch-size`. A finished step does
 ## Reading the results
 
 - `gain` is positive when the candidate is better than the reference.
-- Both parts compare with original CSFM. In part 2 it uses ECG + PPG because it has no Resp channel. This reference replaced epoch 17 after the first results were seen.
+- Both parts compare each arm with original CSFM. In part 2 it uses ECG + PPG because it has no Resp channel. This reference replaced epoch 17 after the first results were seen.
+- Each text arm (B, B2, B3) is also compared with arm A on every task and input, as a paired difference with no margin: `better`, `worse` or `same`.
+- `text_label` marks tasks whose label is charted vitals, nursing fields or ECG machine text, which the text arms saw in training. ICD groups, deaths, age, sex and BMI are not. Text arms are judged mainly on the second group. Arm B's chest reports can also mention respiratory diagnoses.
+- The pre-specified rule chooses between arms A and B only. B2 and B3 get the same checks, and choosing one of them is a decision for the study team.
 - `gate` marks checks that count towards the decision. Tasks with too few positives are listed as skipped.
 - Many checks are made with no multiplicity correction, so one lost check needs a look at its size and CI before it is believed.
 

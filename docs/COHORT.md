@@ -31,7 +31,6 @@ A three-minute slot needs 18 consecutive 10-second windows with all three channe
 
 - Stays with no usable waveform segment or too short for an anchor.
 - Waveform records failing clock checks: 215 with a nonzero master counter, 161 with a UTC offset change.
-- Delta regression only: anchors where the patient died or left the ICU within 24h. They are counted below.
 
 CXR plays no part in cohort selection.
 
@@ -53,22 +52,38 @@ Fate over the next 24h:
 
 | Fate | Anchors | Share | Use |
 |---|---:|---:|---|
-| Stayed in ICU | 16,670 | 74.6% | SOFA-2 change |
-| Left ICU alive | 5,044 | 22.6% | Sensitivity analysis |
-| Died | 627 | 2.8% | Composite worsening endpoint |
+| Stayed in ICU | 16,670 | 74.6% | Real SOFA-2 scores |
+| Left ICU alive | 5,044 | 22.6% | Next window scored 0 |
+| Died | 627 | 2.8% | Next window scored 24, and an event in the composite endpoint |
+
+No anchor is dropped for what happens next, because that is unknown at prediction time. The scores of 24 and 0 follow de Grooth 2017. The other option in that paper, the last observation, is a sensitivity analysis.
 
 Death uses the hospital death time, so it can follow ICU discharge.
 
 ## Splits
 
-Split is by patient. Existing assignments were kept. Patients without one were assigned once by `SHA256(subject_id)` to 70/15/15.
+Split is by patient, and no patient crosses splits.
+
+**One rule for every patient:** `SHA256(subject_id)` to 70/15/15 `[changed 2026-11-03]`. Code: `waveform/icu_cut/common.py`, `assign_split`.
 
 | Split | Patients | Stays | Anchors | Age, median (IQR) | Female | ICU stay, days, median (IQR) |
 |---|---:|---:|---:|---|---:|---|
-| Train | 3,799 | 4,531 | 15,731 | 68 (57–77) | 41.9% | 2.95 (1.83–5.77) |
-| Validation | 814 | 937 | 3,312 | 67 (56–76) | 41.3% | 2.89 (1.81–5.85) |
-| Test | 793 | 948 | 3,298 | 67 (56–77) | 43.6% | 2.95 (1.81–5.57) |
+| Train | 3,811 | 4,510 | 15,615 | 68 (57–77) | 42.3% | 2.95 (1.82–5.77) |
+| Validation | 778 | 933 | 3,284 | 67 (55–76) | 38.2% | 2.95 (1.81–5.43) |
+| Test | 817 | 973 | 3,442 | 67 (56–77) | 44.7% | 2.95 (1.85–6.06) |
 | All | 5,406 | 6,416 | 22,341 | 67 (57–77) | 42.1% | 2.95 (1.82–5.79) |
+
+`plan` and `labels` were rerun with this rule on 2026-11-03, and `labels/cohort_report.json` holds these counts. SOFA-2 day scores did not change.
+
+**Earlier split, used by all results so far:** patients who had an assignment from the 9.22 to 10.16 projects kept it (3,938), and only the 1,468 new patients took the hash rule. Train 3,799, validation 814, test 793. Moving to one rule changes the split of 1,795 patients:
+
+| Earlier \ New | Train | Validation | Test |
+|---|---:|---:|---:|
+| Train | 3,003 | 380 | 416 |
+| Validation | 407 | 307 | 100 |
+| Test | 401 | 91 | 301 |
+
+So every model trained so far has seen 796 patients who are now in validation or test, and all of them are trained again. The 100 earlier validation patients now in test were seen in our earlier analyses, though never trained on.
 
 ## Waveform missingness
 
@@ -84,7 +99,7 @@ Missing slots keep their time position and are masked. Nothing is filled or stit
 
 ## SOFA-2 scoring
 
-Scored from SOFA-2 Table 2 (Ranzani, JAMA 2025), with MIMIC variables following MIT-LCP `mimic-code`. Day scores come from `labels/score.py` and deltas from `labels/finalize.py`.
+Scored from SOFA-2 Table 2 (Ranzani, JAMA 2025), with MIMIC variables following MIT-LCP `mimic-code`. Day scores come from `labels/score/score.py` and deltas from `labels/score/finalize.py`.
 
 1. An ICU day is `[intime+24d, intime+24(d+1))`, counted from ICU admission rather than the calendar date.
 2. Each organ scores 0 to 4 from its worst value in that day. A record counts only if stored by the day's end.
@@ -117,8 +132,8 @@ How each value is read from MIMIC:
 | Organ | Rule |
 |---|---|
 | Brain | Worst GCS outside sedation. If the patient is intubated or a GCS component is missing, motor score alone: 6 scores 0, 5 scores 1, 4 scores 2, 3 scores 3, 1–2 score 4. GCS during a propofol, midazolam, dexmedetomidine, ketamine or lorazepam infusion is not used. A day with no other GCS takes the last GCS before sedation, or 0 if there is none. Delirium drugs are haloperidol, quetiapine and olanzapine |
-| Respiratory | Worst ratio of the day. PaO2 comes from arterial gases only, and FiO2 from the same gas or else charted in the prior 4h. If the day has an arterial gas, PaO2/FiO2 is used. Otherwise SpO2/FiO2 is used with SpO2 <98%, and FiO2 charted in the prior 4h or 0.21 if the device was charted as none. Advanced support is an endotracheal tube, BiPAP, CPAP, high-flow oxygen or a ventilator mode charted in the prior 4h |
-| Cardiovascular | Daily minimum MAP, 10–200 mmHg. A drug counts only with at least 60 minutes of continuous infusion in the day. Norepinephrine and epinephrine doses are summed by hour, and the daily peak is scored. Other agents are dobutamine, vasopressin, phenylephrine, milrinone and angiotensin II, and dopamine when given with another drug |
+| Respiratory | Worst ratio of the day. PaO2 comes from arterial gases only, and FiO2 from the same gas or else charted in the prior 4h. If the day has an arterial gas, PaO2/FiO2 is used. Otherwise SpO2/FiO2 is used with SpO2 <98%, and FiO2 charted in the prior 4h or 0.21 if the device was charted as none. Advanced support is an endotracheal tube, BiPAP, CPAP, high-flow oxygen or a ventilator mode. The last charted device or mode holds for up to 14h, following `ventilation.sql` |
+| Cardiovascular | Daily minimum MAP, 10–200 mmHg. A drug counts only with a continuous infusion of at least 60 minutes by the day's end (Table 2, note j). Touching or overlapping records of one drug form one run, any gap ends it, and a run may begin the day before. Norepinephrine and epinephrine doses are summed by hour, and the daily peak is scored. Other agents are dobutamine, vasopressin, phenylephrine, milrinone and angiotensin II, and dopamine when given with another drug |
 | Liver | Highest bilirubin of the day |
 | Kidney | Highest creatinine and worst urine window of the day. Urine is summed hourly over rolling windows, needs a weight of 30–300 kg, and allows at most a 6h gap between records. RRT comes from procedures, active dialysis charting and CRRT drugs, and scores 4 until 72h after the last session. A stay flagged as chronic dialysis scores 4 on every day |
 | Hemostasis | Lowest platelets of the day |
@@ -127,24 +142,24 @@ How each value is read from MIMIC:
 
 **Evidence** means the organ was actually measured or recorded in that 24h window, so its score rests on data from that window. A carried value or a pre-sedation GCS is not evidence.
 
-Counts below use the 16,670 stayed anchors. Baseline and Future evidence are the share of these anchors with evidence in the window before and after `t`. An organ label needs evidence in both windows and is masked otherwise. Down, Same, Up and Absolute delta ≥ 2 are shares of that row's labels.
+Counts below describe measured change, so they use the 16,670 stayed anchors. Baseline and Future evidence are the share of these anchors with evidence in the window before and after `t`. An organ label needs evidence in both windows and is masked otherwise. Down, Same, Up and Absolute delta ≥ 2 are shares of that row's labels.
 
 | Organ | Baseline evidence | Future evidence | Labels | Patients | Down | Same | Up | Absolute delta ≥ 2 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| Cardiovascular | 99.9% | 99.9% | 16,643 | 3,545 | 23.5% | 63.7% | 12.9% | 6.4% |
+| Cardiovascular | 99.9% | 99.9% | 16,643 | 3,545 | 23.2% | 63.9% | 12.8% | 6.3% |
 | Kidney | 99.8% | 99.5% | 16,562 | 3,508 | 15.3% | 69.8% | 14.9% | 9.3% |
 | Hemostasis | 97.4% | 96.1% | 15,705 | 3,453 | 9.7% | 82.6% | 7.6% | 1.4% |
 | Brain | 80.6% | 83.1% | 12,587 | 3,287 | 17.5% | 68.2% | 14.3% | 7.0% |
-| Respiratory | 82.9% | 81.0% | 12,281 | 2,816 | 21.9% | 61.3% | 16.8% | 11.4% |
+| Respiratory | 82.9% | 81.0% | 12,281 | 2,816 | 21.8% | 61.9% | 16.3% | 11.2% |
 | Liver | 41.7% | 36.8% | 4,688 | 1,376 | 7.5% | 86.5% | 6.0% | 0.3% |
 
 Total delta uses the official rule from SOFA-2 Table 2, note b: a value missing on ICU day 1 scores 0, and a value missing later carries the last observation. The other two rules are sensitivity analyses. Coverage is the share of the 16,670 anchors usable under that rule. Real endpoints is the share of the values behind those totals, six organs at two ends, that have evidence.
 
 | Rule | Anchors | Coverage | Patients | Real endpoints | Down | Same | Up | Absolute delta ≥ 2 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **Official SOFA-2 rule (main)** | **16,670** | **100.0%** | **3,549** | **83.2%** | **41.4%** | **28.7%** | **29.9%** | **33.9%** |
-| At most one carried window | 4,910 | 29.5% | 1,768 | 94.3% | 42.4% | 28.2% | 29.4% | 37.2% |
-| All six real | 2,227 | 13.4% | 853 | 100.0% | 41.6% | 27.0% | 31.3% | 38.2% |
+| **Official SOFA-2 rule (main)** | **16,670** | **100.0%** | **3,549** | **83.2%** | **41.3%** | **29.0%** | **29.8%** | **33.7%** |
+| At most one carried window | 4,910 | 29.5% | 1,768 | 94.3% | 42.3% | 28.4% | 29.3% | 37.0% |
+| All six real | 2,227 | 13.4% | 853 | 100.0% | 41.7% | 26.9% | 31.4% | 38.3% |
 
 Organ labels use evidence only because a carried future value makes that organ's delta 0 by construction. On the 21,360 anchors, liver would read 94.9% unchanged under the official rule rather than 86.5%, and 66.5% of those zeros would be forced.
 
@@ -154,10 +169,10 @@ First ICU day, normal-value imputation, ICU mortality, on the first ICU stay of 
 
 | Measure | This cohort | Published |
 |---|---:|---:|
-| SOFA-2 AUROC | 0.816 | 0.79–0.81 (JAMA 2025), 0.829 (Bai 2026) |
+| SOFA-2 AUROC | 0.817 | 0.79–0.81 (JAMA 2025), 0.829 (Bai 2026) |
 | SOFA-1 AUROC | 0.821 | 0.77–0.80 (JAMA 2025), 0.796 (Bai 2026) |
 | ICU mortality | 6.8% | 7.3% (Bai 2026) |
 
-Against SOFA-1 on the same evidence, SOFA-2 was lower in 44.0%, the same in 28.7% and higher in 27.3% of stays. Published comparisons differ: 40% lower and 11% higher in JAMA 2025, 60.2% lower and 15.3% higher in Helleberg 2026, 15.0% lower and 62.7% higher in Bai 2026.
+Against SOFA-1 on the same evidence, SOFA-2 was lower in 44.0%, the same in 29.0% and higher in 27.0% of stays. Published comparisons differ: 40% lower and 11% higher in JAMA 2025, 60.2% lower and 15.3% higher in Helleberg 2026, 15.0% lower and 62.7% higher in Bai 2026.
 
 Using SpO2/FiO2 for SOFA-1 is our choice, and the SOFA-1 AUROC and this comparison depend on it.

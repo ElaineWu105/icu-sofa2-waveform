@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from probes.evaluate import (TASKS, Task, bootstrap, cap_windows, decide, gain, macro_f1, primary, resp_verdict, retention_verdict,
-                            score)
+                            score, text_label_summary)
 
 
 def row(part, task, input_name, reference, candidate, verdict, gate=True):
@@ -13,8 +13,7 @@ def row(part, task, input_name, reference, candidate, verdict, gate=True):
 
 
 def table(a_lost=False, b_lost=False, a_rr="better", b_rr="better", b_icd="same", b_over_a="same"):
-    rows = [row(1, "age", "ecg", "original", "epoch17", "retained"),
-            row(1, "age", "ecg", "original", "arm_a", "lost" if a_lost else "retained"),
+    rows = [row(1, "age", "ecg", "original", "arm_a", "lost" if a_lost else "retained"),
             row(1, "age", "ecg", "original", "arm_b", "lost" if b_lost else "retained")]
     for candidate, rr, icd in (("arm_a", a_rr, "same"), ("arm_b", b_rr, b_icd)):
         rows += [row(2, "rr_monitor", "all3", "original", candidate, rr), row(2, "support", "all3", "original", candidate, "same"),
@@ -102,6 +101,28 @@ class EvaluateTests(unittest.TestCase):
     def test_decide_no_arm_needs_a_person(self):
         self.assertIsNone(decide(table(a_lost=True, b_lost=True))[1])
         self.assertIsNone(decide(table(a_rr="same", b_rr="same"))[1])
+
+    def test_decide_added_arms_are_reported_but_not_chosen(self):
+        rows = table()
+        added = [row(1, "age", "ecg", "original", "arm_b2", "retained"),
+                 row(2, "rr_monitor", "all3", "original", "arm_b2", "better"),
+                 row(2, "support", "all3", "original", "arm_b2", "same"),
+                 row(2, "icd_respiratory", "all3", "original", "arm_b2", "same"),
+                 row(2, "rr_monitor", "all3", "arm_a", "arm_b2", "better"),
+                 row(2, "support", "all3", "arm_a", "arm_b2", "same")]
+        lines, chosen = decide(pd.concat([rows, pd.DataFrame(added)], ignore_index=True))
+        self.assertEqual(chosen, "arm_a")
+        self.assertTrue(any(line.startswith("- arm_b2: PASS") for line in lines))
+        self.assertTrue(any("arm_b2 against arm A on all three channels: RR better" in line for line in lines))
+
+    def test_text_label_summary_splits_by_label_source(self):
+        rows = pd.DataFrame([dict(row(2, "rr_monitor", "all3", "arm_a", "arm_b2", "better"), text_label=True),
+                             dict(row(1, "age", "ecg", "arm_a", "arm_b2", "worse"), text_label=False),
+                             dict(row(1, "age", "ecg", "original", "arm_b2", "retained"), text_label=False)])
+        summary = text_label_summary(rows).set_index("text_label")
+        self.assertEqual(summary.loc[True, "better"], 1)
+        self.assertEqual(summary.loc[False, "worse"], 1)
+        self.assertEqual(int(summary[["better", "same", "worse"]].to_numpy().sum()), 2)
 
 
 if __name__ == "__main__":

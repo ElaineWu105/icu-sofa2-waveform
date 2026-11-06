@@ -15,4 +15,6 @@ for _path in (CUT_CODE_DIR, FINETUNE_DIR):
 CUT_DIR = CUT_CODE_DIR / "output/cut"
 PLAN_PATH = CUT_CODE_DIR / "output/plan/plan.sqlite"
 TEXT_DIR = HERE / "text"
+# Text sets built by prepare_text.py --set: all sources (arm B), or text about the signal (B2, B3).
+TEXT_DIRS = {"all": TEXT_DIR, "signal": HERE / "text_signal"}
 CHECKPOINT = ROOT / "pretrained_model_for_share/CSFM_base.pth"

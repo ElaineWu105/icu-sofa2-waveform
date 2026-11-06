@@ -1,13 +1,17 @@
 {
   "chosen": "arm_b",
   "lines": [
-    "- arm_a: FAIL. Lost 1, inconclusive 13 of 31 retention checks. All three channels against original CSFM on ECG + PPG: RR better, invasive support better, ICD respiratory same.",
-    "  - lost: death_1y on ecg, auroc gain -0.033 [-0.0614, -0.0052]",
-    "- arm_b: PASS. Lost 0, inconclusive 9 of 31 retention checks. All three channels against original CSFM on ECG + PPG: RR better, invasive support better, ICD respiratory same.",
-    "- epoch17 for reference: lost 2 of 31 retention checks.",
-    "- Chosen encoder: arm_b."
+    "- arm_a: FAIL. Lost 1, inconclusive 12 of 31 retention checks. All three channels against original CSFM on ECG + PPG: RR better, invasive support better, ICD respiratory same.",
+    "  - lost: sex on ecg, auroc gain -0.0318 [-0.0615, -0.0015]",
+    "- arm_b: PASS. Lost 0, inconclusive 12 of 31 retention checks. All three channels against original CSFM on ECG + PPG: RR better, invasive support better, ICD respiratory same.",
+    "- arm_b2: PASS. Lost 0, inconclusive 11 of 31 retention checks. All three channels against original CSFM on ECG + PPG: RR better, invasive support better, ICD respiratory same.",
+    "- arm_b3: PASS. Lost 0, inconclusive 15 of 31 retention checks. All three channels against original CSFM on ECG + PPG: RR better, invasive support better, ICD respiratory same.",
+    "- Chosen encoder under the pre-specified rule (arms A and B): arm_b.",
+    "- arm_b2 against arm A on all three channels: RR worse, invasive support worse.",
+    "- arm_b3 against arm A on all three channels: RR worse, invasive support worse.",
+    "- arm_b2, arm_b3 were added after the first results. They get the same checks, but choosing one of them is a decision for the study team."
   ],
   "skipped": {
-    "lbbb on ecg": "positives: fit 33, validation 0"
+    "lbbb on ecg": "positives: fit 24, validation 2"
   }
 }

@@ -1,8 +1,9 @@
 """Frozen 768-dimensional CLS features for every encoder and input.
 
-One pass over the windows feeds all encoders, so waveforms are read once. Encoders stay
-in eval mode with no gradients, no masking and no text. A stopped run resumes from the
-last saved batch. Features are patient-level private files.
+One pass over the windows feeds every encoder still to do, so waveforms are read once.
+Encoders stay in eval mode with no gradients, no masking and no text. Progress is kept per
+encoder: a stopped run resumes from the last saved batch, and an added encoder is extracted
+without redoing the others. Features are patient-level private files.
 """
 import argparse
 from contextlib import nullcontext
@@ -16,17 +17,32 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader, Dataset
 
-from common import ARMS, CUT, ENCODERS, EPOCH17, INPUTS, ORIGINAL, PRIVATE, RESP_INPUTS, ROW_BYTES
+from common import ARMS, CUT, ENCODERS, INPUTS, ORIGINAL, PRIVATE, RESP_INPUTS, ROW_BYTES
 from model import CSFMEncoder, MAEConfig
 
 FEATURES = PRIVATE / "features"
 PPG, RESP = 12, 13
 
 
-def conditions():
+def conditions(encoders=ENCODERS):
     """Original CSFM has no Resp channel, so it never receives one."""
-    return [(encoder, name) for encoder in ENCODERS for name in INPUTS
+    return [(encoder, name) for encoder in encoders for name in INPUTS
             if not (encoder == "original" and name in RESP_INPUTS)]
+
+
+def read_progress(path, identity, weights):
+    """Windows done per encoder. Older files kept one count for all encoders."""
+    saved = json.loads(path.read_text()) if path.is_file() else {"identity": identity, "encoders": {}}
+    if "encoders" not in saved:
+        stamps = saved["identity"].pop("checkpoints")
+        saved = {"identity": saved["identity"],
+                 "encoders": {name: {"checkpoint": stamp, "done": saved["done"]} for name, stamp in stamps.items()}}
+    if saved["identity"] != identity:
+        raise RuntimeError("Saved features come from other windows or settings; move them away first.")
+    for name, entry in saved["encoders"].items():
+        if name in weights and entry["checkpoint"] != weights[name]:
+            raise RuntimeError(f"{name} weights changed after its features were saved; move them away first.")
+    return saved
 
 
 def load_original(cfg):
@@ -49,8 +65,6 @@ def load_original(cfg):
 def load_encoder(name, cfg):
     if name == "original":
         return load_original(cfg)
-    if name == "epoch17":
-        return CSFMEncoder.from_export(torch.load(EPOCH17, map_location="cpu", weights_only=False))
     return CSFMEncoder.from_export(torch.load(ARMS[name], map_location="cpu", weights_only=False)["encoder"])
 
 
@@ -83,23 +97,22 @@ def main():
     FEATURES.mkdir(mode=0o700, parents=True, exist_ok=True)
     cfg = MAEConfig()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    encoders = {}
-    for name in ENCODERS:
-        encoders[name] = load_encoder(name, cfg).to(device).eval().requires_grad_(False)
-    identity = {"windows": len(windows), "subjects": int(windows.subject_id.sum()), "config": asdict(cfg),
-                "checkpoints": {name: os.stat(path).st_mtime_ns for name, path in
-                                {"original": ORIGINAL, "epoch17": EPOCH17, **ARMS}.items()}}
-    identity = json.loads(json.dumps(identity))
+    identity = json.loads(json.dumps({"windows": len(windows), "subjects": int(windows.subject_id.sum()),
+                                      "config": asdict(cfg)}))
+    weights = {name: os.stat(path).st_mtime_ns for name, path in {"original": ORIGINAL, **ARMS}.items()}
     progress_path = FEATURES / "progress.json"
-    start = 0
-    if progress_path.is_file():
-        saved = json.loads(progress_path.read_text())
-        if saved["identity"] != identity:
-            raise RuntimeError("Saved features come from other windows or weights; move them away first.")
-        start = saved["done"]
+    saved = read_progress(progress_path, identity, weights)
+    done_by = {name: saved["encoders"].get(name, {"done": 0})["done"] for name in ENCODERS}
+    todo = [name for name in ENCODERS if done_by[name] < len(windows)]
+    if not todo:
+        print("features done", flush=True)
+        return
+    start = min(done_by[name] for name in todo)
+    print("extracting", ", ".join(todo), "from window", start, flush=True)
+    encoders = {name: load_encoder(name, cfg).to(device).eval().requires_grad_(False) for name in todo}
     shape = (len(windows), cfg.dim)
     stores = {}
-    for encoder, name in conditions():
+    for encoder, name in conditions(todo):
         path = FEATURES / f"{encoder}__{name}.npy"
         stores[encoder, name] = np.lib.format.open_memmap(path, mode="r+" if path.is_file() else "w+", dtype=np.float32, shape=shape)
         os.chmod(path, 0o600)
@@ -113,7 +126,7 @@ def main():
         for batch, (signal, ids) in enumerate(loader, 1):
             signal, ids = signal.to(device, non_blocking=True), ids.to(device, non_blocking=True)
             size = len(signal)
-            for encoder, name in conditions():
+            for encoder, name in conditions(todo):
                 columns = list(INPUTS[name])
                 with autocast():
                     output = encoders[encoder](signal[:, columns], ids[:, columns])
@@ -125,7 +138,9 @@ def main():
                 for store in stores.values():
                     store.flush()
                 temporary = progress_path.with_suffix(".tmp")
-                temporary.write_text(json.dumps({"identity": identity, "done": done}))
+                for name in todo:
+                    saved["encoders"][name] = {"checkpoint": weights[name], "done": done}
+                temporary.write_text(json.dumps(saved))
                 temporary.replace(progress_path)
                 rate = (done - start) / (time.time() - began)
                 print(f"windows {done} of {len(windows)}, {rate:.0f} per second", flush=True)

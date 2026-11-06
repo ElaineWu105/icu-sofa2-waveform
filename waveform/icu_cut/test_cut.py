@@ -78,16 +78,17 @@ class Planning(unittest.TestCase):
         self.assertEqual(plan.day_fate(0, 0, DAY_US + 5, None), "left_alive")
         self.assertEqual(plan.day_fate(0, 0, 3 * DAY_US, 2 * DAY_US), "died")
 
-    def test_split_is_stable_and_existing_assignment_is_kept(self):
-        self.assertEqual(common.assign_new_split(123), common.assign_new_split("123"))
-        shares = [common.assign_new_split(value) for value in range(20000)]
+    def test_split_is_stable_and_70_15_15(self):
+        self.assertEqual(common.assign_split(123), common.assign_split("123"))
+        self.assertEqual([common.assign_split(value) for value in (4, 5, 9)], ["train", "val", "test"])
+        shares = [common.assign_split(value) for value in range(20000)]
         self.assertAlmostEqual(shares.count("train") / 20000, .7, delta=.02)
-        with tempfile.TemporaryDirectory() as folder:
-            path = Path(folder) / "pairs.csv"
-            path.write_text("subject_id,split\n7,test\n7,test\n")
-            splits, known = plan.load_splits(path, [7])
-        self.assertEqual(splits, {7: "test"})
-        self.assertEqual(known, {7})
+        self.assertAlmostEqual(shares.count("val") / 20000, .15, delta=.02)
+
+    def test_cut_refuses_to_write_into_source_data(self):
+        with tempfile.TemporaryDirectory() as folder, mock.patch.object(cut, "WAVE_ROOT", Path(folder)):
+            with self.assertRaises(SystemExit):
+                cut.main(["--output", str(Path(folder) / "cut")])
 
 
 class DayWriter(unittest.TestCase):

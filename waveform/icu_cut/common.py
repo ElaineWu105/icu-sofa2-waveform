@@ -22,7 +22,6 @@ for _path in (INVENTORY_DIR, PREPROCESS_DIR):
 
 WAVE_ROOT = Path(os.environ["MIMIC_WAVEFORM_DIR"])
 EHR_ROOT = Path(os.environ["MIMIC_IV_DIR"])
-SPLIT_CSV = HERE / "inputs/pairs.csv"
 
 SECOND_US = 1_000_000
 WINDOW_US = 10 * SECOND_US
@@ -45,8 +44,8 @@ def sha256(path):
     return value.hexdigest()
 
 
-def assign_new_split(subject_id):
-    """Stable 70/15/15 for patients without an earlier assignment."""
+def assign_split(subject_id):
+    """Stable 70/15/15 by patient, the same on every run and machine."""
     bucket = int(hashlib.sha256(str(int(subject_id)).encode()).hexdigest()[:8], 16) % 100
     return "train" if bucket < 70 else "val" if bucket < 85 else "test"
 

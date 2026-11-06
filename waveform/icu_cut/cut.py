@@ -31,8 +31,8 @@ import time
 
 import numpy as np
 
-from common import (CLIPS_PER_DAY, DAY_US, FAILED, HERE, INVENTORY_DIR, MIN_VALID_CLIPS, NOT_PLANNED,
-                    PREPROCESS_DIR, READY, REJECTED, SLOTS_PER_DAY, WINDOW_US, sha256, valid_clips)
+from common import (CLIPS_PER_DAY, DAY_US, EHR_ROOT, FAILED, HERE, INVENTORY_DIR, MIN_VALID_CLIPS, NOT_PLANNED,
+                    PREPROCESS_DIR, READY, REJECTED, SLOTS_PER_DAY, WAVE_ROOT, WINDOW_US, sha256, valid_clips)
 from processing import canonical_settings, process_window
 from source import LEAD_ORDER, SnapshotSource, _choose_channels
 
@@ -249,7 +249,7 @@ def main(argv=None):
     parser.add_argument("--report-only", action="store_true", help="Recount finished days; decode nothing")
     args = parser.parse_args(argv)
     args.plan, args.output = args.plan.resolve(), args.output.resolve()
-    if args.output.is_relative_to(Path("/home/public")):
+    if any(args.output.is_relative_to(root.resolve()) for root in (WAVE_ROOT, EHR_ROOT)):
         parser.error("Do not write into clinical sources.")
     if args.report_only:
         print(json.dumps(report(args.output, args.plan), indent=1, ensure_ascii=False))

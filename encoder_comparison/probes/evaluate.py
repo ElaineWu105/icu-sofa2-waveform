@@ -16,7 +16,7 @@ from scipy.stats import rankdata
 from sklearn.metrics import average_precision_score, f1_score, precision_recall_curve, roc_auc_score
 from xgboost import XGBClassifier, XGBRegressor
 
-from common import ENCODERS, ICD_CARDIAC, ICD_RESP, PRIVATE, RESP_INPUTS, RESULTS
+from common import ARMS, ENCODERS, ICD_CARDIAC, ICD_RESP, PRIVATE, RESP_INPUTS, RESULTS, TEXT_ARMS, TEXT_FREE_TASKS
 from probe_labels.build import RHYTHM_CLASSES
 
 HERE = Path(__file__).resolve().parent
@@ -228,10 +228,15 @@ def enough(kind, y, fit, val):
 
 
 def run_task(task, name, windows, patients, threads):
-    """Fit every encoder on one task and input, reusing saved predictions."""
+    """Fit every encoder on one task and input. Saved predictions are reused and only missing encoders are fitted."""
     path = PREDICTIONS / f"{task.name}__{name}.npz"
+    wanted = [encoder for encoder in ENCODERS if not (encoder == "original" and name in RESP_INPUTS)]
+    saved = {}
     if path.is_file():
-        return path
+        with np.load(path) as stored:
+            saved = {key: stored[key] for key in stored.files}
+        if all(f"pred_{encoder}" in saved for encoder in wanted):
+            return path
     known, y, subjects, splits = task_rows(task, windows, patients)
     tuning = np.array([in_tuning_fold(subject) for subject in subjects]) & (splits == "train")
     fit, val = (splits == "train") & ~tuning, splits == "val"
@@ -241,8 +246,14 @@ def run_task(task, name, windows, patients, threads):
     result = {"y": y[val], "subjects": subjects[val], "constant": constant(task.kind, y[fit], int(val.sum())), "fit_rows": int(fit.sum())}
     if task.name.startswith("rr_"):
         result["spectral"] = windows.rr_spectral.to_numpy()[known][val]
-    for encoder in ENCODERS:
-        if encoder == "original" and name in RESP_INPUTS:
+    if saved:
+        same = (np.array_equal(np.asarray(saved["y"], float), np.asarray(result["y"], float), equal_nan=True)
+                and np.array_equal(saved["subjects"], result["subjects"]) and int(saved["fit_rows"]) == result["fit_rows"])
+        if not same:
+            raise RuntimeError(f"Saved {path.name} comes from other rows; delete it first.")
+        result = saved
+    for encoder in wanted:
+        if f"pred_{encoder}" in result:
             continue
         x = features_for(task, encoder, name, windows, patients, known)
         tuned, scored = fit_predict(task.kind, x[fit], y[fit], [x[tuning], x[val]], threads)
@@ -294,9 +305,7 @@ def resp_verdict(low, high):
 
 def comparisons(task, name, data, draws):
     """Rows comparing candidates with the reference encoder for this part."""
-    pairs = [("original", "epoch17"), ("original", "arm_a"), ("original", "arm_b")]
-    if task.part == 2:
-        pairs.append(("arm_a", "arm_b"))
+    pairs = [("original", arm) for arm in ARMS] + [("arm_a", arm) for arm in TEXT_ARMS]
     models = sorted({model for pair in pairs for model in pair})
     sampled = bootstrap(task, data, models, draws)
     rows = []
@@ -304,9 +313,11 @@ def comparisons(task, name, data, draws):
         point = gain(task.metric, score(task.kind, data["y"], data[f"pred_{reference}"], data[f"thr_{reference}"])[task.metric],
                      score(task.kind, data["y"], data[f"pred_{candidate}"], data[f"thr_{candidate}"])[task.metric])
         low, high = np.quantile(gain(task.metric, sampled[reference], sampled[candidate]), [.025, .975])
-        verdict = retention_verdict(point, low, high, task.margin) if task.part == 1 else resp_verdict(low, high)
+        # Retention margins apply to an arm against original CSFM; a text arm against arm A is a plain paired difference.
+        retention = task.part == 1 and reference == "original"
+        verdict = retention_verdict(point, low, high, task.margin) if retention else resp_verdict(low, high)
         rows.append({"part": task.part, "task": task.name, "input": name, "metric": task.metric, "reference": reference,
-                     "candidate": candidate, "gain": round(float(point), 4), "ci_low": round(float(low), 4),
+                     "candidate": candidate, "text_label": task.name not in TEXT_FREE_TASKS, "gain": round(float(point), 4), "ci_low": round(float(low), 4),
                      "ci_high": round(float(high), 4), "margin": task.margin, "gate": task.gate, "verdict": verdict,
                      "draws": len(sampled[reference])})
     return rows
@@ -329,31 +340,49 @@ def metric_rows(task, name, data):
 def decide(table):
     """Apply the pre-specified rule to the comparison table."""
     lines, passed = [], {}
-    gates = table[(table.part == 1) & table.gate]
+    gates = table[(table.part == 1) & table.gate & (table.reference == "original")]
     resp = table[(table.part == 2) & (table.input == "all3") & (table.reference == "original")]
-    for candidate in ("arm_a", "arm_b"):
+    for candidate in ARMS:
         rows = gates[gates.candidate == candidate]
         lost = rows[rows.verdict == "lost"]
         unclear = rows[rows.verdict == "inconclusive"]
         mine = resp[resp.candidate == candidate].set_index("task").verdict
         rr, support, icd_resp = (mine.get(task, "missing") for task in ("rr_monitor", "support", "icd_respiratory"))
         improved = "better" in (rr, support) and "worse" not in (rr, support) and "missing" not in (rr, support)
-        fair = candidate == "arm_a" or icd_resp in ("same", "better")
+        fair = candidate not in TEXT_ARMS or icd_resp in ("same", "better")
         passed[candidate] = lost.empty and improved and fair
         lines += [f"- {candidate}: {'PASS' if passed[candidate] else 'FAIL'}. Lost {len(lost)}, inconclusive {len(unclear)} of {len(rows)} "
                   f"retention checks. All three channels against original CSFM on ECG + PPG: RR {rr}, invasive support {support}, ICD respiratory {icd_resp}."]
         lines += [f"  - lost: {row.task} on {row.input}, {row.metric} gain {row.gain} [{row.ci_low}, {row.ci_high}]" for row in lost.itertuples()]
     versus = table[(table.part == 2) & (table.input == "all3") & (table.reference == "arm_a") & table.task.isin(["rr_monitor", "support"])]
-    if all(passed.values()):
-        chosen = "arm_b" if (versus.verdict == "better").any() else "arm_a"
-    elif any(passed.values()):
-        chosen = next(name for name, value in passed.items() if value)
+    # The pre-specified rule covers arms A and B only.
+    rule = {name: passed[name] for name in ("arm_a", "arm_b")}
+    if all(rule.values()):
+        chosen = "arm_b" if (versus[versus.candidate == "arm_b"].verdict == "better").any() else "arm_a"
+    elif any(rule.values()):
+        chosen = next(name for name, value in rule.items() if value)
     else:
         chosen = None
-    epoch = gates[gates.candidate == "epoch17"]
-    lines.append(f"- epoch17 for reference: lost {int((epoch.verdict == 'lost').sum())} of {len(epoch)} retention checks.")
-    lines.append(f"- Chosen encoder: {chosen}." if chosen else "- No arm passed, so this needs a decision by the study team.")
+    lines.append(f"- Chosen encoder under the pre-specified rule (arms A and B): {chosen}." if chosen
+                 else "- No arm passed, so this needs a decision by the study team.")
+    added = [name for name in ARMS if name not in rule]
+    for candidate in added:
+        mine = versus[versus.candidate == candidate].set_index("task").verdict
+        lines.append(f"- {candidate} against arm A on all three channels: RR {mine.get('rr_monitor', 'missing')}, "
+                     f"invasive support {mine.get('support', 'missing')}.")
+    if added:
+        lines.append(f"- {', '.join(added)} were added after the first results. They get the same checks, "
+                     "but choosing one of them is a decision for the study team.")
     return lines, chosen
+
+
+def text_label_summary(table):
+    """Verdict counts for each text arm against arm A, split by whether the task's label is in the training text."""
+    rows = table[(table.reference == "arm_a") & table.candidate.isin(TEXT_ARMS)]
+    if rows.empty:
+        return rows
+    counts = rows.groupby(["candidate", "text_label", "verdict"]).size().unstack(fill_value=0)
+    return counts.reindex(columns=["better", "same", "worse"], fill_value=0).reset_index()
 
 
 def markdown(frame):
@@ -370,6 +399,10 @@ def write_report(metrics, table, lines, skipped):
             "The Resp reference was changed from epoch 17 to original CSFM after the first results were seen, to match the stated goal.", "",
             "## Decision", "", *lines, "",
             "## Primary metric per task", "", markdown(wide[order].reset_index()), "",
+            "## Text arms against arm A, by label source", "",
+            "`text_label` is true when the task's label is charted vitals, nursing fields or ECG machine text, "
+            "which the text arms saw in training. Arm B's chest reports can also mention respiratory diagnoses.", "",
+            markdown(text_label_summary(table)), "",
             "## Paired comparisons", "", "`gain` is positive when the candidate is better than the reference.", "",
             markdown(table.drop(columns=["part"])), ""]
     if skipped:

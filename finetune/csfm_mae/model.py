@@ -166,6 +166,12 @@ class CSFMEncoder(nn.Module):
         return self.transformer(self.dropout(tokens), keys)[:, 0]
 
 
+def normalized(patches: Tensor) -> Tensor:
+    """Per-patch target, as MAE norm_pix_loss; the CSFM decoder reconstructs this (see check_mae.py)."""
+    mean, variance = patches.mean(-1, keepdim=True), patches.var(-1, keepdim=True)
+    return (patches - mean) / (variance + 1e-6).sqrt()
+
+
 def _sample_mask(eligible: Tensor, ratio: float, generator: torch.Generator | None) -> Tensor:
     result = torch.zeros_like(eligible)
     for i in range(eligible.shape[0]):
@@ -324,7 +330,7 @@ class CSFMMAE(nn.Module):
             chosen = modalities & (ids == channel)
             if chosen.any():
                 prediction[chosen] = self.to_seg[channel](wave_features[chosen]).to(prediction.dtype)
-        target = safe_signal.reshape(b, c, p, cfg.patch_size)
+        target = normalized(safe_signal.reshape(b, c, p, cfg.patch_size).float())
         error = (prediction.float() - target.float()).square()
         mask3d = wmask.reshape(b, c, p)
         masked_error = error[mask3d]

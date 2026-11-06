@@ -9,6 +9,7 @@ output_tail
 inputs
 runs
 text
+text_signal
 private_verify/
 *.sqlite*
 *.pt
@@ -20,7 +21,7 @@ private_verify/
 *.csv.gz
 !encoder_comparison/results/*.csv
 
-# Link made by link_existing_outputs.sh
+# Original CSFM checkpoint, linked by hand (README, Setup)
 /pretrained_model_for_share
 
 # Aggregates with very small patient counts

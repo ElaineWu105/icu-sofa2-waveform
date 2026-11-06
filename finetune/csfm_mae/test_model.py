@@ -43,7 +43,9 @@ class MAETests(unittest.TestCase):
     def test_masked_targets_cannot_leak_to_encoder_or_predictions(self):
         out = self.run_model()
         changed = self.signal.reshape(2, 3, 4, 5).clone()
-        changed[out['waveform_mask'].reshape(2, 3, 4)] += 100
+        hidden = out['waveform_mask'].reshape(2, 3, 4)
+        # A per-patch shift would vanish under the normalized target, so change the shape.
+        changed[hidden] += 100 * torch.randn_like(changed[hidden])
         changed_text = self.text.clone()
         changed_text[out['text_mask']] = 29
         other = self.run_model(signal=changed.reshape(2, 3, 20), input_ids=changed_text,
@@ -52,6 +54,14 @@ class MAETests(unittest.TestCase):
         torch.testing.assert_close(out['wave_prediction'], other['wave_prediction'], rtol=0, atol=0)
         torch.testing.assert_close(out['text_logits'], other['text_logits'], rtol=0, atol=0)
         self.assertNotEqual(out['loss_wave'].item(), other['loss_wave'].item())
+
+    def test_signal_loss_uses_per_patch_normalized_targets(self):
+        out = self.run_model()
+        mask = out['waveform_mask'].reshape(2, 3, 4)
+        target = self.signal.reshape(2, 3, 4, 5)
+        target = (target - target.mean(-1, keepdim=True)) / (target.var(-1, keepdim=True) + 1e-6).sqrt()
+        expected = (out['wave_prediction'] - target)[mask].square().mean()
+        torch.testing.assert_close(out['loss_wave'], expected)
 
     def test_padding_values_have_no_effect(self):
         out = self.run_model()

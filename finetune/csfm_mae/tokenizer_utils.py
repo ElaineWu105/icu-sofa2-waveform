@@ -96,6 +96,12 @@ def load_tokenizer(tokenizer_dir: str | Path | None = None):
     return tokenizer
 
 
+def continuation_ids(tokenizer_dir: str | Path | None = None) -> frozenset[int]:
+    """IDs of WordPiece pieces that continue a word, marked '##' in the vocabulary."""
+    vocab = (_resolve_dir(tokenizer_dir) / "vocab.txt").read_text(encoding="utf-8").splitlines()
+    return frozenset(number for number, piece in enumerate(vocab) if piece.startswith("##"))
+
+
 def tokenizer_contract(tokenizer_dir: str | Path | None = None) -> dict[str, Any]:
     """Return a JSON-serializable, hash-verified mapping provenance contract."""
     return _asset_contract(_resolve_dir(tokenizer_dir))

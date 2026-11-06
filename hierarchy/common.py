@@ -12,9 +12,12 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 PRIVATE = Path(os.environ.get("HIERARCHY_PRIVATE", HERE / "private"))
 RUNS = PRIVATE / "runs"
-CUT_DIRS = (ROOT / "waveform/icu_cut/output/cut/days", ROOT / "waveform/icu_cut/output_tail/cut/days")
+CUT_DIR = ROOT / "waveform/icu_cut/output/cut/days"
 ANCHORS = ROOT / "labels/private/anchors.pkl"
-ENCODER = ROOT / "finetune/arms/runs/arm_B/best_overall.pt"
+# EHR inputs of the level 3 baseline path, from labels/e2/e2.py.
+E2_TABLE = ROOT / "labels/private/e2.pkl"
+# Arm A, chosen on 2026-11-06 (docs/SETTING.md, "Encoder choice").
+ENCODER = ROOT / "finetune/arms/runs/arm_A/selected.pt"
 ORGANS = ("brain", "resp", "cv", "liver", "kidney", "hemo")
 ROW_BYTES = 3 * 2500 * 4
 SLOTS_PER_CLIP, CLIPS_PER_HOUR, CLIPS_PER_DAY = 18, 20, 480
@@ -29,11 +32,7 @@ valid_clips = _cut.valid_clips
 
 
 def day_folder(stay, day):
-    """The cut folder holding this day; added days live in the second one."""
-    for root in CUT_DIRS:
-        if (root / str(stay) / f"day_{day:03d}_meta.npz").is_file():
-            return root / str(stay)
-    raise FileNotFoundError(f"No cut for stay {stay} day {day}")
+    return CUT_DIR / str(stay)
 
 
 def load_days(splits=("train", "val")):

@@ -13,10 +13,17 @@ ANCHORS = ROOT / "labels/private/anchors.pkl"
 CHART = HERE / "label_audit/private/chart.pkl"
 EHR = os.environ["MIMIC_IV_DIR"].rstrip("/") + "/"
 ORIGINAL = ROOT / "pretrained_model_for_share/CSFM_base.pth"
-EPOCH17 = HERE / "epoch17_best_encoder.pt"
-ARMS = {"arm_a": ROOT / "finetune/arms/runs/arm_A/best_overall.pt",
-        "arm_b": ROOT / "finetune/arms/runs/arm_B/best_overall.pt"}
-ENCODERS = ("original", "epoch17", "arm_a", "arm_b")
+ARMS = {"arm_a": ROOT / "finetune/arms/runs/arm_A/selected.pt",
+        "arm_b": ROOT / "finetune/arms/runs/arm_B/selected.pt",
+        "arm_b2": ROOT / "finetune/arms/runs/arm_B2/selected.pt",
+        "arm_b3": ROOT / "finetune/arms/runs/arm_B3/selected.pt"}
+ENCODERS = ("original", *ARMS)
+# Arms trained with text. B2 and B3 were added on 2026-11-06, after the first results.
+TEXT_ARMS = ("arm_b", "arm_b2", "arm_b3")
+# Tasks whose label is not charted vitals, nursing fields or ECG machine text, so the text arms'
+# training text does not hold it. Arm B's chest reports can still mention respiratory diagnoses.
+TEXT_FREE_TASKS = ("icd_cardiac", "icd_respiratory", "age", "sex", "bmi",
+                   "death_1y", "death_hospital", "death_30d", "death_24h")
 # Positions in the cut signal: ECG, PPG, Resp.
 INPUTS = {"ecg": (0,), "ppg": (1,), "ecg_ppg": (0, 1), "all3": (0, 1, 2), "resp": (2,)}
 RESP_INPUTS = ("all3", "resp")

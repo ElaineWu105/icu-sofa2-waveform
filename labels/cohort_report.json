@@ -3,8 +3,8 @@
   "stays": 13604,
   "icu_deaths": 1031,
   "icu_mortality_pct": 7.58,
-  "auroc_sofa2": 0.8098,
-  "auroc_sofa1": 0.8073,
+  "auroc_sofa2": 0.8097,
+  "auroc_sofa1": 0.8072,
   "sofa2_median_iqr": [
    4.0,
    2.0,
@@ -16,22 +16,22 @@
    7.0
   ],
   "sofa2_versus_sofa1": {
-   "same_pct": 32.1,
-   "higher_pct": 23.7,
+   "same_pct": 32.3,
+   "higher_pct": 23.5,
    "lower_pct": 44.2
   },
   "organ_mean_sofa2": {
    "brain": 0.744,
-   "resp": 0.848,
-   "cv": 1.32,
+   "resp": 0.84,
+   "cv": 1.315,
    "liver": 0.237,
    "kidney": 1.155,
    "hemo": 0.692
   },
   "organ_mean_sofa1": {
    "brain": 0.737,
-   "resp": 1.375,
-   "cv": 1.369,
+   "resp": 1.368,
+   "cv": 1.366,
    "liver": 0.279,
    "kidney": 0.865,
    "hemo": 0.583
@@ -47,21 +47,21 @@
   "sofa2_variants": {
    "no_urine_or_rrt_in_kidney": {
     "same_pct": 34.9,
-    "higher_pct": 9.3,
-    "lower_pct": 55.8,
-    "auroc": 0.8109
+    "higher_pct": 9.2,
+    "lower_pct": 55.9,
+    "auroc": 0.8108
    },
    "no_rrt_in_kidney": {
-    "same_pct": 32.2,
-    "higher_pct": 19.3,
+    "same_pct": 32.3,
+    "higher_pct": 19.2,
     "lower_pct": 48.5,
-    "auroc": 0.8091
+    "auroc": 0.809
    },
    "abg_only_resp": {
     "same_pct": 26.5,
-    "higher_pct": 19.5,
+    "higher_pct": 19.4,
     "lower_pct": 54.1,
-    "auroc": 0.7903
+    "auroc": 0.7904
    }
   }
  },
@@ -69,35 +69,35 @@
   "stays": 7306,
   "icu_deaths": 495,
   "icu_mortality_pct": 6.78,
-  "auroc_sofa2": 0.8161,
-  "auroc_sofa1": 0.8205,
+  "auroc_sofa2": 0.8168,
+  "auroc_sofa1": 0.8211,
   "sofa2_median_iqr": [
    5.0,
    2.0,
    7.0
   ],
   "sofa1_median_iqr": [
-   5.0,
+   4.0,
    3.0,
    7.0
   ],
   "sofa2_versus_sofa1": {
-   "same_pct": 28.7,
-   "higher_pct": 27.3,
+   "same_pct": 29.0,
+   "higher_pct": 27.0,
    "lower_pct": 44.0
   },
   "organ_mean_sofa2": {
    "brain": 0.706,
-   "resp": 0.9,
-   "cv": 1.373,
+   "resp": 0.894,
+   "cv": 1.366,
    "liver": 0.249,
    "kidney": 1.078,
    "hemo": 0.735
   },
   "organ_mean_sofa1": {
    "brain": 0.703,
-   "resp": 1.466,
-   "cv": 1.375,
+   "resp": 1.46,
+   "cv": 1.372,
    "liver": 0.292,
    "kidney": 0.72,
    "hemo": 0.629
@@ -113,21 +113,21 @@
   "sofa2_variants": {
    "no_urine_or_rrt_in_kidney": {
     "same_pct": 33.2,
-    "higher_pct": 10.3,
-    "lower_pct": 56.5,
-    "auroc": 0.8173
+    "higher_pct": 10.1,
+    "lower_pct": 56.7,
+    "auroc": 0.8181
    },
    "no_rrt_in_kidney": {
-    "same_pct": 29.0,
-    "higher_pct": 23.6,
+    "same_pct": 29.2,
+    "higher_pct": 23.4,
     "lower_pct": 47.4,
-    "auroc": 0.814
+    "auroc": 0.8147
    },
    "abg_only_resp": {
-    "same_pct": 24.5,
-    "higher_pct": 23.6,
-    "lower_pct": 51.9,
-    "auroc": 0.7993
+    "same_pct": 24.7,
+    "higher_pct": 23.4,
+    "lower_pct": 52.0,
+    "auroc": 0.7997
    }
   }
  },
@@ -135,9 +135,9 @@
  "anchors_passing": 22341,
  "anchors_stayed": 16670,
  "passing_by_split": {
-  "train": 15731,
-  "val": 3312,
-  "test": 3298
+  "train": 15615,
+  "test": 3442,
+  "val": 3284
  },
  "passing_by_fate": {
   "stayed": 16670,
@@ -147,9 +147,9 @@
  "passing_patients": 5406,
  "passing_stays": 6416,
  "patients_by_split": {
-  "test": 793,
-  "train": 3799,
-  "val": 814
+  "test": 817,
+  "train": 3811,
+  "val": 778
  },
  "organ_delta_real": {
   "brain": {
@@ -163,45 +163,45 @@
    "coverage_pct": 75.5,
    "patients": 3287,
    "by_split": {
-    "test": 1868,
-    "train": 8907,
-    "val": 1812
+    "test": 1969,
+    "train": 8739,
+    "val": 1879
    },
    "baseline_evidence_pct": 80.6,
    "future_evidence_pct": 83.1
   },
   "resp": {
    "n": 12281,
-   "down_pct": 21.9,
-   "same_pct": 61.3,
-   "up_pct": 16.8,
-   "up_ge2_pct": 4.8,
-   "abs_ge2_pct": 11.4,
-   "abs_ge3_pct": 2.5,
+   "down_pct": 21.8,
+   "same_pct": 61.9,
+   "up_pct": 16.3,
+   "up_ge2_pct": 4.6,
+   "abs_ge2_pct": 11.2,
+   "abs_ge3_pct": 2.1,
    "coverage_pct": 73.7,
    "patients": 2816,
    "by_split": {
-    "test": 1785,
-    "train": 8601,
-    "val": 1895
+    "test": 1959,
+    "train": 8480,
+    "val": 1842
    },
    "baseline_evidence_pct": 82.9,
    "future_evidence_pct": 81.0
   },
   "cv": {
    "n": 16643,
-   "down_pct": 23.5,
-   "same_pct": 63.7,
-   "up_pct": 12.9,
-   "up_ge2_pct": 2.1,
-   "abs_ge2_pct": 6.4,
+   "down_pct": 23.2,
+   "same_pct": 63.9,
+   "up_pct": 12.8,
+   "up_ge2_pct": 2.0,
+   "abs_ge2_pct": 6.3,
    "abs_ge3_pct": 1.0,
    "coverage_pct": 99.8,
    "patients": 3545,
    "by_split": {
-    "test": 2447,
-    "train": 11728,
-    "val": 2468
+    "test": 2585,
+    "train": 11586,
+    "val": 2472
    },
    "baseline_evidence_pct": 99.9,
    "future_evidence_pct": 99.9
@@ -217,9 +217,9 @@
    "coverage_pct": 28.1,
    "patients": 1376,
    "by_split": {
-    "test": 676,
-    "train": 3297,
-    "val": 715
+    "test": 728,
+    "train": 3226,
+    "val": 734
    },
    "baseline_evidence_pct": 41.7,
    "future_evidence_pct": 36.8
@@ -235,9 +235,9 @@
    "coverage_pct": 99.4,
    "patients": 3508,
    "by_split": {
-    "test": 2443,
-    "train": 11659,
-    "val": 2460
+    "test": 2577,
+    "train": 11527,
+    "val": 2458
    },
    "baseline_evidence_pct": 99.8,
    "future_evidence_pct": 99.5
@@ -253,9 +253,9 @@
    "coverage_pct": 94.2,
    "patients": 3453,
    "by_split": {
-    "test": 2326,
-    "train": 11081,
-    "val": 2298
+    "test": 2428,
+    "train": 10924,
+    "val": 2353
    },
    "baseline_evidence_pct": 97.4,
    "future_evidence_pct": 96.1
@@ -264,53 +264,53 @@
  "total_delta": {
   "six_real_both_ends": {
    "n": 2227,
-   "down_pct": 41.6,
-   "same_pct": 27.0,
-   "up_pct": 31.3,
-   "up_ge2_pct": 15.6,
-   "abs_ge2_pct": 38.2,
-   "abs_ge3_pct": 19.6,
+   "down_pct": 41.7,
+   "same_pct": 26.9,
+   "up_pct": 31.4,
+   "up_ge2_pct": 15.5,
+   "abs_ge2_pct": 38.3,
+   "abs_ge3_pct": 19.3,
    "coverage_pct": 13.4,
    "patients": 853,
    "real_endpoints_pct": 100.0,
    "by_split": {
-    "test": 328,
-    "train": 1565,
-    "val": 334
+    "test": 354,
+    "train": 1535,
+    "val": 338
    }
   },
   "carry_at_most_one_window": {
    "n": 4910,
-   "down_pct": 42.4,
-   "same_pct": 28.2,
-   "up_pct": 29.4,
-   "up_ge2_pct": 14.5,
-   "abs_ge2_pct": 37.2,
-   "abs_ge3_pct": 18.3,
+   "down_pct": 42.3,
+   "same_pct": 28.4,
+   "up_pct": 29.3,
+   "up_ge2_pct": 14.3,
+   "abs_ge2_pct": 37.0,
+   "abs_ge3_pct": 18.1,
    "coverage_pct": 29.5,
    "patients": 1768,
    "real_endpoints_pct": 94.3,
    "by_split": {
-    "test": 714,
-    "train": 3452,
-    "val": 744
+    "test": 794,
+    "train": 3385,
+    "val": 731
    }
   },
   "full_sofa2_rule": {
    "n": 16670,
-   "down_pct": 41.4,
-   "same_pct": 28.7,
-   "up_pct": 29.9,
-   "up_ge2_pct": 13.4,
-   "abs_ge2_pct": 33.9,
-   "abs_ge3_pct": 15.4,
+   "down_pct": 41.3,
+   "same_pct": 29.0,
+   "up_pct": 29.8,
+   "up_ge2_pct": 13.3,
+   "abs_ge2_pct": 33.7,
+   "abs_ge3_pct": 15.1,
    "coverage_pct": 100.0,
    "patients": 3549,
    "real_endpoints_pct": 83.2,
    "by_split": {
-    "test": 2454,
-    "train": 11747,
-    "val": 2469
+    "test": 2588,
+    "train": 11606,
+    "val": 2476
    }
   }
  },
@@ -331,48 +331,48 @@
  },
  "demographics": {
   "test": {
-   "patients": 793,
-   "stays": 948,
+   "patients": 817,
+   "stays": 973,
    "age_median_iqr": [
     67.0,
     56.0,
     77.0
    ],
-   "female_pct": 43.6,
+   "female_pct": 44.7,
    "icu_los_days_median_iqr": [
     2.95,
-    1.81,
-    5.57
+    1.85,
+    6.06
    ]
   },
   "train": {
-   "patients": 3799,
-   "stays": 4531,
+   "patients": 3811,
+   "stays": 4510,
    "age_median_iqr": [
     68.0,
     57.0,
     77.0
    ],
-   "female_pct": 41.9,
+   "female_pct": 42.3,
    "icu_los_days_median_iqr": [
     2.95,
-    1.83,
+    1.82,
     5.77
    ]
   },
   "val": {
-   "patients": 814,
-   "stays": 937,
+   "patients": 778,
+   "stays": 933,
    "age_median_iqr": [
     67.0,
-    56.25,
+    55.0,
     76.0
    ],
-   "female_pct": 41.3,
+   "female_pct": 38.2,
    "icu_los_days_median_iqr": [
-    2.89,
+    2.95,
     1.81,
-    5.85
+    5.43
    ]
   },
   "all": {

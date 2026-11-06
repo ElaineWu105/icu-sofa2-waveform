@@ -4,6 +4,10 @@ Each ICU day d of a stay is [intime+24d, intime+24(d+1)). A day is planned when
 it can serve as the 24h input of an anchor t=day end, t<outtime, and its headers
 could still reach 384 of 480 valid three-minute clips. SOFA availability is not
 used here: labels are joined later through (stay_id, day).
+
+Records are first ended at the index end time. The index sometimes ends a record
+early, so days that only pass with records ended at their master header are then
+added to the same plan, with their own header inventory and segment numbers.
 """
 from __future__ import annotations
 
@@ -20,8 +24,7 @@ import numpy as np
 import pandas as pd
 
 from common import (CLIPS_PER_DAY, DAY_US, EHR_ROOT, HERE, MAX_BAD_SLOTS, MIN_VALID_CLIPS,
-                    SLOTS_PER_CLIP, SLOTS_PER_DAY, SPLIT_CSV, WAVE_ROOT, WINDOW_US,
-                    assign_new_split)
+                    SLOTS_PER_CLIP, SLOTS_PER_DAY, WAVE_ROOT, WINDOW_US, assign_split)
 from indexing import load_wave_records, timestamp_us
 from native import inspect_record
 from source import LEAD_ORDER, _choose_channels, _segment_right
@@ -30,6 +33,8 @@ HOUR_US = DAY_US // 24
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS metadata(key TEXT PRIMARY KEY, value TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS records(subject_id TEXT NOT NULL, record_id TEXT NOT NULL,
+  segments_json TEXT NOT NULL, skips_json TEXT NOT NULL, PRIMARY KEY(subject_id, record_id));
+CREATE TABLE IF NOT EXISTS records_open_ended(subject_id TEXT NOT NULL, record_id TEXT NOT NULL,
   segments_json TEXT NOT NULL, skips_json TEXT NOT NULL, PRIMARY KEY(subject_id, record_id));
 CREATE TABLE IF NOT EXISTS stays(stay_id INTEGER PRIMARY KEY, subject_id INTEGER NOT NULL,
   hadm_id INTEGER NOT NULL, split TEXT NOT NULL, intime_us INTEGER NOT NULL, outtime_us INTEGER NOT NULL,
@@ -60,14 +65,6 @@ def load_stays(ehr_root, wave_subjects):
     return stays[["stay_id", "subject_id", "hadm_id", "intime_us", "outtime_us", "death_us"]], total
 
 
-def load_splits(path, subjects):
-    frame = pd.read_csv(path, usecols=["subject_id", "split"]).drop_duplicates()
-    if frame.subject_id.duplicated().any():
-        raise ValueError("A patient has more than one existing split.")
-    existing = dict(zip(frame.subject_id, frame.split))
-    return {int(subject): existing.get(int(subject), assign_new_split(subject)) for subject in subjects}, set(existing)
-
-
 def open_ended(record):
     """End a record at its master header, not the index end time, which is sometimes early."""
     start, end = datetime.fromisoformat(record["starttime"]), datetime.fromisoformat(record["endtime"])
@@ -83,9 +80,9 @@ def inspect_job(job):
     return record["subject_id"], record["record_id"], segments, dict(skips)
 
 
-def inventory(db, records, wave_root, workers):
+def inventory(db, records, wave_root, workers, table="records"):
     """Resumable header inventory. Every result is committed by the parent."""
-    done = {(row[0], row[1]) for row in db.execute("SELECT subject_id, record_id FROM records")}
+    done = {(row[0], row[1]) for row in db.execute(f"SELECT subject_id, record_id FROM {table}")}
     pending = [record for record in records if (record["subject_id"], record["record_id"]) not in done]
     print(f"[inventory] records={len(records)}; pending={len(pending)}", flush=True)
     if not pending:
@@ -95,7 +92,7 @@ def inventory(db, records, wave_root, workers):
         futures = [pool.submit(inspect_job, (record, wave_root)) for record in pending]
         for count, future in enumerate(as_completed(futures), 1):
             subject, record_id, segments, skips = future.result()
-            db.execute("INSERT INTO records VALUES(?,?,?,?)",
+            db.execute(f"INSERT INTO {table} VALUES(?,?,?,?)",
                        (subject, record_id, json.dumps(segments, allow_nan=False), json.dumps(skips)))
             if count % 100 == 0:
                 db.commit()
@@ -158,20 +155,25 @@ def day_fate(start_us, intime, outtime, death):
     return "left_alive" if outtime < t + DAY_US else "stayed"
 
 
-def build(db, stays, splits, records, skip_days=frozenset()):
-    db.execute("DELETE FROM days")
-    db.execute("DELETE FROM segments")
-    db.execute("DELETE FROM stays")
+def build(db, stays, splits, table="records", append=False):
+    """Plan days from one header inventory. With append, keep earlier days and number new segments after them."""
+    if not append:
+        db.execute("DELETE FROM days")
+        db.execute("DELETE FROM segments")
+        db.execute("DELETE FROM stays")
+    skip_days = frozenset(db.execute("SELECT stay_id, day FROM days").fetchall())
+    offset = db.execute("SELECT COUNT(*) FROM segments").fetchone()[0]
     by_subject, skips = defaultdict(list), Counter()
-    for subject, _, segments_json, skips_json in db.execute("SELECT * FROM records").fetchall():
+    for subject, _, segments_json, skips_json in db.execute(f"SELECT * FROM {table}").fetchall():
         by_subject[int(subject)].extend(json.loads(segments_json))
         skips.update(json.loads(skips_json))
     segment_ids, counts = {}, Counter()
     for stay in stays.itertuples():
         counts["stays"] += 1
         death = None if stay.death_us is None or pd.isna(stay.death_us) else int(stay.death_us)
-        db.execute("INSERT INTO stays VALUES(?,?,?,?,?,?,?)", (int(stay.stay_id), int(stay.subject_id),
-                   int(stay.hadm_id), splits[int(stay.subject_id)], int(stay.intime_us), int(stay.outtime_us), death))
+        if not append:
+            db.execute("INSERT INTO stays VALUES(?,?,?,?,?,?,?)", (int(stay.stay_id), int(stay.subject_id),
+                       int(stay.hadm_id), splits[int(stay.subject_id)], int(stay.intime_us), int(stay.outtime_us), death))
         segments = [segment for segment in by_subject.get(int(stay.subject_id), [])
                     if int(segment["origin_us"]) < stay.outtime_us and _segment_right(segment) > stay.intime_us]
         days = (stay.outtime_us - stay.intime_us - 1) // DAY_US
@@ -197,7 +199,7 @@ def build(db, stays, splits, records, skip_days=frozenset()):
             for first, stop, position in runs_of(view):
                 sid = segments[position]["segment_id"]
                 if sid not in segment_ids:
-                    segment_ids[sid] = len(segment_ids)
+                    segment_ids[sid] = offset + len(segment_ids)
                     db.execute("INSERT INTO segments VALUES(?,?)",
                                (segment_ids[sid], json.dumps(segments[position], allow_nan=False)))
                 runs.append([first, stop, segment_ids[sid]])
@@ -210,14 +212,13 @@ def build(db, stays, splits, records, skip_days=frozenset()):
     return counts, skips
 
 
-def summarize(db, counts, skips, stays_seen, known_patients):
+def summarize(db, counts, skips, stays_seen, added):
     one = lambda sql: db.execute(sql).fetchone()[0]
     patients = {row[0] for row in db.execute("SELECT DISTINCT subject_id FROM days")}
     summary = {
-        "icu_stays_in_mimic": stays_seen, "attrition": dict(counts),
+        "icu_stays_in_mimic": stays_seen, "attrition": dict(counts), "added_past_index_end": dict(added),
         "planned_stays": one("SELECT COUNT(DISTINCT stay_id) FROM days"), "planned_patients": len(patients),
         "planned_windows": one("SELECT SUM(planned_windows) FROM days"),
-        "patients_with_new_split": len(patients - known_patients),
         "days_by_split": dict(db.execute("SELECT split, COUNT(*) FROM days GROUP BY split").fetchall()),
         "patients_by_split": dict(db.execute("SELECT split, COUNT(DISTINCT subject_id) FROM days GROUP BY split").fetchall()),
         "days_by_fate": dict(db.execute("SELECT fate, COUNT(*) FROM days GROUP BY fate").fetchall()),
@@ -235,10 +236,7 @@ def main(argv=None):
     parser.add_argument("--output", type=Path, default=HERE / "output/plan")
     parser.add_argument("--wave-root", type=Path, default=WAVE_ROOT)
     parser.add_argument("--ehr-root", type=Path, default=EHR_ROOT)
-    parser.add_argument("--split-csv", type=Path, default=SPLIT_CSV)
     parser.add_argument("--workers", type=int, default=16)
-    parser.add_argument("--ignore-index-end", action="store_true", help="End records at the master header")
-    parser.add_argument("--skip-plan", type=Path, help="Leave out days already in this plan database")
     args = parser.parse_args(argv)
     args.output.mkdir(parents=True, exist_ok=True)
     db = sqlite3.connect(args.output / "plan.sqlite")
@@ -247,24 +245,22 @@ def main(argv=None):
     subjects = {int(subject) for subject in records_by_subject}
     stays, stays_seen = load_stays(args.ehr_root, subjects)
     print(f"[stays] adult stays of waveform patients={len(stays)}; patients={stays.subject_id.nunique()}", flush=True)
-    splits, known = load_splits(args.split_csv, stays.subject_id.unique())
-    if args.ignore_index_end:
-        records_by_subject = {subject: [open_ended(record) for record in rows] for subject, rows in records_by_subject.items()}
-    skip_days = frozenset()
-    if args.skip_plan:
-        earlier = sqlite3.connect(f"file:{args.skip_plan}?mode=ro", uri=True)
-        skip_days = frozenset(earlier.execute("SELECT stay_id, day FROM days").fetchall())
-        earlier.close()
-    wanted = []
+    splits = {int(subject): assign_split(subject) for subject in stays.subject_id.unique()}
     grouped = {subject: frame for subject, frame in stays.groupby("subject_id")}
-    for subject, frame in grouped.items():
-        lo, hi = frame.intime_us.min(), frame.outtime_us.max()
-        for record in records_by_subject[str(subject)]:
-            if record["start_us"] < hi and record["end_us"] > lo:
-                wanted.append(record)
-    inventory(db, wanted, args.wave_root, args.workers)
-    counts, skips = build(db, stays, splits, wanted, skip_days)
-    summary = summarize(db, counts, skips, stays_seen, known)
+
+    def overlapping(by_subject):
+        wanted = []
+        for subject, frame in grouped.items():
+            lo, hi = frame.intime_us.min(), frame.outtime_us.max()
+            wanted.extend(record for record in by_subject[str(subject)] if record["start_us"] < hi and record["end_us"] > lo)
+        return wanted
+
+    inventory(db, overlapping(records_by_subject), args.wave_root, args.workers)
+    counts, skips = build(db, stays, splits)
+    open_records = {subject: [open_ended(record) for record in rows] for subject, rows in records_by_subject.items()}
+    inventory(db, overlapping(open_records), args.wave_root, args.workers, table="records_open_ended")
+    added, _ = build(db, stays, splits, table="records_open_ended", append=True)
+    summary = summarize(db, counts, skips, stays_seen, added)
     summary["waveform_index"] = record_info
     (args.output / "plan_summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False) + "\n")
     print(json.dumps({key: summary[key] for key in ("attrition", "planned_stays", "planned_patients", "planned_windows",
